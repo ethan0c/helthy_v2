@@ -1,9 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, AnimatePresence } from "framer-motion";
-import { Activity, Brain, Target, Zap, ChevronDown, X } from "lucide-react";
+import {
+  motion,
+  useScroll,
+  AnimatePresence,
+  LayoutGroup,
+  useInView,
+} from "framer-motion";
+import {
+  Activity,
+  Brain,
+  Target,
+  Zap,
+  ChevronDown,
+  X,
+  Mic,
+  MessageSquare,
+  Wand2,
+  Send,
+} from "lucide-react";
 
 // Reusable small top meta row with divider, label, and number bubble
 function SectionMeta({
@@ -44,6 +61,14 @@ export default function Home() {
   const [isDynamicIslandVisible, setIsDynamicIslandVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [aiExpanded, setAiExpanded] = useState(false);
+  const [aiManualCollapsed, setAiManualCollapsed] = useState(false);
+  const aiTriggerRef = useRef<HTMLDivElement | null>(null);
+  // in-view detection near the AI section to auto-expand insights
+  const aiTriggerInView = useInView(aiTriggerRef, {
+    amount: 0.4,
+    margin: "0px 0px -10% 0px",
+  });
   const { scrollYProgress } = useScroll();
 
   useEffect(() => {
@@ -68,6 +93,22 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  // Auto-expand AI when the trigger is in view; collapse when out of view (unless user manually closed)
+  useEffect(() => {
+    if (aiTriggerInView && !aiManualCollapsed) {
+      setAiExpanded(true);
+    } else if (!aiTriggerInView && !aiManualCollapsed) {
+      setAiExpanded(false);
+    }
+  }, [aiTriggerInView, aiManualCollapsed]);
+
+  // Reset manual collapse flag once the trigger leaves view so it can auto-expand next time
+  useEffect(() => {
+    if (!aiTriggerInView && aiManualCollapsed) {
+      setAiManualCollapsed(false);
+    }
+  }, [aiTriggerInView, aiManualCollapsed]);
 
   // Themes as planets in the solar system
   const themePlanets = [
@@ -161,325 +202,380 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-1 sm:p-3 lg:p-6">
         {/* iPhone Screen - Super curved edges with silver background */}
         <div className="min-h-screen bg-silver-abstract curved-edges overflow-hidden relative shadow-2xl">
-          {/* Dynamic Island - Transforms into navbar */}
-          <motion.div
-            className="fixed top-10 left-1/2 transform -translate-x-1/2 z-30"
-            animate={{
-              width: isNavExpanded ? "54%" : 384,
-              height: isNavExpanded ? 64 : 84,
-              y: isNavExpanded ? 10 : 0,
-              opacity: isDynamicIslandVisible ? 1 : 0,
-              scale: isDynamicIslandVisible ? 1 : 0.8,
-            }}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
-            <div className="w-full h-full dynamic-island rounded-full flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                {!isNavExpanded ? (
-                  <motion.div
-                    key="island"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center space-x-2"
-                  >
-                    <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                    <div className="w-16 h-1 bg-white/60 rounded-full"></div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="navbar"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                    className="flex items-center justify-between w-full px-8 text-sm font-medium text-white"
-                  >
-                    <Image
-                      src="/logo-white.png"
-                      alt="Helthy"
-                      width={120}
-                      height={40}
-                      className="h-8 w-auto"
-                    />
-                    <div className="flex items-center space-x-6 font-sf-pro">
-                      <a
-                        href="#home"
-                        className="hover:text-gray-300 transition-colors"
-                      >
-                        Home
-                      </a>
-                      <a
-                        href="#features"
-                        className="hover:text-gray-300 transition-colors"
-                      >
-                        Features
-                      </a>
-                      <a
-                        href="#ai"
-                        className="hover:text-gray-300 transition-colors"
-                      >
-                        AI
-                      </a>
-                      <a
-                        href="#themes"
-                        className="hover:text-gray-300 transition-colors"
-                      >
-                        Themes
-                      </a>
-                      <a
-                        href="#faq"
-                        className="hover:text-gray-300 transition-colors"
-                      >
-                        FAQ
-                      </a>
-                      <a
-                        href="#waitlist"
-                        className="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition-colors shadow-lg font-medium text-xs"
-                      >
-                        Waitlist
-                      </a>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-
-          {/* Removed old separate navbar */}
-          {/* Removed old separate navbar */}
-
-          {/* Hero Section - Full iPhone Screen */}
-          <section
-            id="home"
-            className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
-          >
-            {/* Clean, simple background */}
-            <div className="absolute inset-0">
-              <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-slate-300/30 to-gray-400/20 rounded-full blur-3xl opacity-50"></div>
-              <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-gray-300/25 to-slate-400/15 rounded-full blur-3xl opacity-40"></div>
-              <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-zinc-300/20 to-gray-500/10 rounded-full blur-2xl opacity-30"></div>
-            </div>
-
-            <div className="relative z-10 px-6 w-full max-w-5xl mx-auto text-center mt-16">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: "easeOut" }}
-              >
-                <SectionMeta
-                  label="Home"
-                  number="01"
-                  tone="light"
-                  className="text-left"
-                />
-                {/* Status Bar Space */}
-                <div className="h-8"></div>
-
-                {/* Main Greeting */}
-                <div className="mb-12">
-                  <h3 className="text-lg text-gray-600 mb-4 font-sf-pro font-light">
-                    Good morning, Alex
-                  </h3>
-                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6 font-playfair leading-tight">
-                    Ready to crush{" "}
-                    <span className="bg-gradient-to-r from-slate-700 via-gray-800 to-zinc-900 bg-clip-text text-transparent italic">
-                      today's goals?
-                    </span>
-                  </h1>
-                  <p className="text-xl md:text-2xl text-gray-600 font-sf-pro font-light max-w-2xl mx-auto leading-relaxed">
-                    Your AI-powered companion for smarter fitness, better
-                    nutrition, and faster results.
-                  </p>
-                </div>
-
-                {/* Quick Stats Dashboard */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                  <motion.div
-                    className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-left">
-                        <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                          Calories Left
-                        </p>
-                        <p className="text-4xl font-bold text-gray-900 font-sf-pro">
-                          1,247
-                        </p>
-                        <p className="text-xs text-green-600 font-sf-pro font-medium">
-                          On track
-                        </p>
-                      </div>
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Target className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-left">
-                        <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                          Today's Focus
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900 font-sf-pro">
-                          Upper Body
-                        </p>
-                        <p className="text-xs text-orange-600 font-sf-pro font-medium">
-                          45 min planned
-                        </p>
-                      </div>
-                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Zap className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-left">
-                        <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                          AI Suggests
-                        </p>
-                        <p className="text-xl font-bold text-gray-900 font-sf-pro">
-                          Post-lunch walk
-                        </p>
-                        <p className="text-xs text-purple-600 font-sf-pro font-medium">
-                          20 min boost
-                        </p>
-                      </div>
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Brain className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Main CTA */}
-                <motion.div
-                  className="space-y-8"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                    <motion.button
-                      className="bg-gradient-to-r from-gray-800 to-black text-white px-12 py-5 rounded-full text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
-                      whileHover={{ scale: 1.05, y: -3 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Start Your Journey
-                    </motion.button>
-                    <motion.button
-                      className="border-2 border-gray-400 text-gray-700 px-12 py-5 rounded-full text-lg font-semibold hover:border-gray-600 hover:bg-gray-50 transition-all duration-300 font-sf-pro"
-                      whileHover={{ scale: 1.05, y: -3 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Join Waitlist
-                    </motion.button>
-                  </div>
-                  <p className="text-gray-500 text-sm font-sf-pro">
-                    Join 10,000+ users already transforming their fitness
-                    journey
-                  </p>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            {/* Scroll Indicator */}
+          <LayoutGroup id="ai-group">
+            {/* Dynamic Island - Transforms into navbar */}
             <motion.div
-              className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="fixed top-10 left-1/2 transform -translate-x-1/2 z-30"
+              animate={{
+                width: isNavExpanded ? "54%" : 384,
+                height: isNavExpanded ? 64 : 84,
+                y: isNavExpanded ? 10 : 0,
+                opacity: isDynamicIslandVisible ? 1 : 0,
+                scale: isDynamicIslandVisible ? 1 : 0.8,
+              }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              <ChevronDown className="w-6 h-6 text-gray-400" />
+              <div className="w-full h-full dynamic-island rounded-full flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  {!isNavExpanded ? (
+                    <motion.div
+                      key="island"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center space-x-2"
+                    >
+                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                      <div className="w-16 h-1 bg-white/60 rounded-full"></div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="navbar"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      className="flex items-center justify-between w-full px-8 text-sm font-medium text-white"
+                    >
+                      <Image
+                        src="/logo-white.png"
+                        alt="Helthy"
+                        width={120}
+                        height={40}
+                        className="h-8 w-auto"
+                      />
+                      <div className="flex items-center space-x-6 font-sf-pro">
+                        <a
+                          href="#home"
+                          className="hover:text-gray-300 transition-colors"
+                        >
+                          Home
+                        </a>
+                        <a
+                          href="#features"
+                          className="hover:text-gray-300 transition-colors"
+                        >
+                          Features
+                        </a>
+                        <a
+                          href="#ai"
+                          className="hover:text-gray-300 transition-colors"
+                        >
+                          AI
+                        </a>
+                        <a
+                          href="#themes"
+                          className="hover:text-gray-300 transition-colors"
+                        >
+                          Themes
+                        </a>
+                        <a
+                          href="#faq"
+                          className="hover:text-gray-300 transition-colors"
+                        >
+                          FAQ
+                        </a>
+                        <a
+                          href="#waitlist"
+                          className="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition-colors shadow-lg font-medium text-xs"
+                        >
+                          Waitlist
+                        </a>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
-          </section>
 
-          {/* Features Section - Inside iPhone */}
-          <section id="features" className="py-20 px-4 bg-white">
-            <div className="max-w-6xl mx-auto">
-              <SectionMeta label="Features" number="02" tone="light" />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Left: Exercise expanded view (tall) */}
+            {/* Removed old separate navbar */}
+            {/* Removed old separate navbar */}
+
+            {/* Hero Section - Full iPhone Screen */}
+            <section
+              id="home"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
+            >
+              {/* Clean, simple background */}
+              <div className="absolute inset-0">
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-slate-300/30 to-gray-400/20 rounded-full blur-3xl opacity-50"></div>
+                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-gray-300/25 to-slate-400/15 rounded-full blur-3xl opacity-40"></div>
+                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-zinc-300/20 to-gray-500/10 rounded-full blur-2xl opacity-30"></div>
+              </div>
+
+              <div className="relative z-10 px-6 w-full max-w-5xl mx-auto text-center mt-16">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
                 >
-                  <ExerciseCard className="h-[520px]" />
-                </motion.div>
+                  <SectionMeta
+                    label="Home"
+                    number="01"
+                    tone="light"
+                    className="text-left"
+                  />
+                  {/* Status Bar Space */}
+                  <div className="h-8"></div>
 
-                {/* Middle: AI insights (bottom-aligned) */}
-                <motion.div
-                  className="lg:self-end"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                >
-                  <AIInsightsCard className="h-[280px]" />
-                </motion.div>
+                  {/* Main Greeting */}
+                  <div className="mb-12">
+                    <h3 className="text-lg text-gray-600 mb-4 font-sf-pro font-light">
+                      Good morning, Alex
+                    </h3>
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6 font-playfair leading-tight">
+                      Ready to crush{" "}
+                      <span className="bg-gradient-to-r from-slate-700 via-gray-800 to-zinc-900 bg-clip-text text-transparent italic">
+                        today's goals?
+                      </span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-gray-600 font-sf-pro font-light max-w-2xl mx-auto leading-relaxed">
+                      Your AI-powered companion for smarter fitness, better
+                      nutrition, and faster results.
+                    </p>
+                  </div>
 
-                {/* Right: Food section (taller than exercise) */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.15 }}
-                >
-                  <FoodCard className="h-[640px]" />
+                  {/* Quick Stats Dashboard */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <motion.div
+                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-left">
+                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
+                            Calories Left
+                          </p>
+                          <p className="text-4xl font-bold text-gray-900 font-sf-pro">
+                            1,247
+                          </p>
+                          <p className="text-xs text-green-600 font-sf-pro font-medium">
+                            On track
+                          </p>
+                        </div>
+                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Target className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-left">
+                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
+                            Today's Focus
+                          </p>
+                          <p className="text-2xl font-bold text-gray-900 font-sf-pro">
+                            Upper Body
+                          </p>
+                          <p className="text-xs text-orange-600 font-sf-pro font-medium">
+                            45 min planned
+                          </p>
+                        </div>
+                        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Zap className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-left">
+                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
+                            AI Suggests
+                          </p>
+                          <p className="text-xl font-bold text-gray-900 font-sf-pro">
+                            Post-lunch walk
+                          </p>
+                          <p className="text-xs text-purple-600 font-sf-pro font-medium">
+                            20 min boost
+                          </p>
+                        </div>
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Brain className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Main CTA */}
+                  <motion.div
+                    className="space-y-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                      <motion.button
+                        className="bg-gradient-to-r from-gray-800 to-black text-white px-12 py-5 rounded-full text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
+                        whileHover={{ scale: 1.05, y: -3 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Start Your Journey
+                      </motion.button>
+                      <motion.button
+                        className="border-2 border-gray-400 text-gray-700 px-12 py-5 rounded-full text-lg font-semibold hover:border-gray-600 hover:bg-gray-50 transition-all duration-300 font-sf-pro"
+                        whileHover={{ scale: 1.05, y: -3 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Join Waitlist
+                      </motion.button>
+                    </div>
+                    <p className="text-gray-500 text-sm font-sf-pro">
+                      Join 10,000+ users already transforming their fitness
+                      journey
+                    </p>
+                  </motion.div>
                 </motion.div>
               </div>
-            </div>
-          </section>
 
-          {/* AI Section - Inside iPhone */}
-          <section
-            id="ai"
-            className="py-20 px-4 bg-gradient-to-br from-gray-50 to-white"
-          >
-            <div className="max-w-6xl mx-auto">
-              <SectionMeta label="AI" number="03" tone="light" />
-              {/* Placeholder structure; content to be refined once details are provided */}
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200">
-                  <h3 className="text-gray-900 font-sf-pro font-semibold mb-2">
-                    AI Capabilities
-                  </h3>
-                  <p className="text-gray-600 font-sf-pro text-sm">
-                    We’ll showcase core AI features here once you share details.
-                  </p>
-                </div>
-                <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200">
-                  <h3 className="text-gray-900 font-sf-pro font-semibold mb-2">
-                    Personalization
-                  </h3>
-                  <p className="text-gray-600 font-sf-pro text-sm">
-                    A compact demo of how insights adapt to users over time.
-                  </p>
+              {/* Scroll Indicator */}
+              <motion.div
+                className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <ChevronDown className="w-6 h-6 text-gray-400" />
+              </motion.div>
+            </section>
+
+            {/* Features Section - Inside iPhone */}
+            <section id="features" className="py-20 px-4 bg-white">
+              <div className="max-w-6xl mx-auto">
+                <SectionMeta label="Features" number="02" tone="light" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                  {/* Left: Exercise expanded view (tall) */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <ExerciseCard className="h-[520px]" />
+                  </motion.div>
+
+                  {/* Middle: AI insights (bottom-aligned) */}
+                  {!aiExpanded && (
+                    <motion.div
+                      className="lg:self-end cursor-pointer"
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: 0.1 }}
+                      onClick={() => {
+                        setAiExpanded(true);
+                        // smooth scroll to AI section to highlight the expansion
+                        setTimeout(() => {
+                          document.getElementById("ai")?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }, 50);
+                      }}
+                      aria-label="Expand AI features"
+                    >
+                      <motion.div layoutId="ai-insights">
+                        <AIInsightsCard className="h-[280px]" />
+                      </motion.div>
+                    </motion.div>
+                  )}
+
+                  {/* Right: Food section (taller than exercise) */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.15 }}
+                  >
+                    <FoodCard className="h-[640px]" />
+                  </motion.div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+
+            {/* AI Section - Inside iPhone */}
+            <section
+              id="ai"
+              className="py-20 px-4 bg-gradient-to-br from-gray-50 to-white"
+            >
+              <div className="max-w-6xl mx-auto">
+                {/* Sentinel for auto-expansion trigger */}
+                <div
+                  ref={aiTriggerRef as any}
+                  aria-hidden
+                  className="h-1 w-1"
+                />
+                <SectionMeta label="AI" number="03" tone="light" />
+                <AnimatePresence initial={false}>
+                  {aiExpanded && (
+                    <motion.div
+                      layoutId="ai-insights"
+                      className="bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-lg rounded-3xl border border-gray-300 shadow-2xl p-4 sm:p-6"
+                      initial={{ opacity: 0.92, y: 6 }}
+                      animate={{ opacity: 1, y: 10 }}
+                      exit={{ opacity: 0, y: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 220,
+                        damping: 26,
+                        mass: 0.9,
+                      }}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
+                            AI Coach
+                          </div>
+                          <div className="text-sm text-gray-600 font-sf-pro">
+                            Your personal assistant for fitness and nutrition
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setAiExpanded(false);
+                            setAiManualCollapsed(true);
+                          }}
+                          className="p-2 rounded-full hover:bg-gray-200/60 text-gray-700"
+                          aria-label="Collapse AI features"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* Left column: two stacked cards */}
+                        <div className="flex flex-col gap-4">
+                          <VoiceLoggingCard className="h-60" />
+                          <AIDescribeCard className="h-60" />
+                        </div>
+
+                        {/* Right column: chat panel spans two columns on large screens */}
+                        <div className="lg:col-span-2">
+                          <AIChatPanel className="min-h-[496px]" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </section>
+          </LayoutGroup>
         </div>
       </div>
 
@@ -681,6 +777,30 @@ function ExerciseCard({ className = "" }: { className?: string }) {
         Expanded view of your current exercise with sets and rest.
       </p>
 
+      {/* Exercise photos */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-gray-300 shadow-sm">
+          <Image
+            src="/exercise/IMG_6893.jpeg"
+            alt="Exercise photo 1"
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className="object-cover"
+            priority={false}
+          />
+        </div>
+        <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-gray-300 shadow-sm">
+          <Image
+            src="/exercise/IMG_6895.jpeg"
+            alt="Exercise photo 2"
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className="object-cover"
+            priority={false}
+          />
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-gray-200 bg-white/60 p-4">
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -744,7 +864,7 @@ function ExerciseCard({ className = "" }: { className?: string }) {
 function AIInsightsCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+      className={`bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-lg rounded-3xl border border-gray-300 shadow-lg p-6 flex flex-col ${className}`}
     >
       <div className="flex items-center gap-2 mb-2">
         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center">
@@ -759,7 +879,7 @@ function AIInsightsCard({ className = "" }: { className?: string }) {
       </p>
 
       <div className="mt-auto">
-        <div className="rounded-2xl border border-gray-200 bg-white/60 p-4">
+        <div className="rounded-2xl border border-gray-300 bg-gray-100/80 p-4">
           <div className="text-xs text-gray-500 font-sf-pro mb-1">
             Today’s Focus
           </div>
@@ -788,6 +908,18 @@ function FoodCard({ className = "" }: { className?: string }) {
       <p className="text-gray-600 text-sm font-sf-pro mb-4">
         Plan meals and macros with zero friction.
       </p>
+
+      {/* Food image */}
+      <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-gray-300 shadow-sm mb-4">
+        <Image
+          src="/food/foodcards.jpg"
+          alt="Food preview"
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover"
+          priority={false}
+        />
+      </div>
 
       <div className="space-y-4">
         {/* Macro bars */}
@@ -831,6 +963,136 @@ function FoodCard({ className = "" }: { className?: string }) {
           <div className="text-sm font-semibold text-gray-900 font-sf-pro">
             1,420 / 2,100
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VoiceLoggingCard({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl border border-gray-200 bg-white/65 backdrop-blur-lg p-5 shadow-lg ${className}`}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center">
+          <Mic className="w-4 h-4" />
+        </div>
+        <h4 className="text-sm font-semibold text-gray-900 font-sf-pro">
+          Voice logging
+        </h4>
+      </div>
+      <p className="text-xs text-gray-600 font-sf-pro mb-4">
+        Log workouts and meals hands‑free.
+      </p>
+
+      <div className="mt-2 flex flex-col items-center justify-center gap-4">
+        <button
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+          aria-label="Start voice logging"
+        >
+          <Mic className="w-6 h-6" />
+        </button>
+        <div className="w-full h-10 rounded-xl bg-white/70 border border-gray-200 flex items-center px-3 gap-2">
+          <div className="flex-1 h-4 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-full" />
+          <span className="text-[10px] text-gray-500 font-sf-pro">
+            Listening…
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AIDescribeCard({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl border border-gray-200 bg-white/65 backdrop-blur-lg p-5 shadow-lg ${className}`}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 text-white flex items-center justify-center">
+          <Wand2 className="w-4 h-4" />
+        </div>
+        <h4 className="text-sm font-semibold text-gray-900 font-sf-pro">
+          AI describe
+        </h4>
+      </div>
+      <p className="text-xs text-gray-600 font-sf-pro mb-4">
+        Describe your goal; we’ll turn it into a plan.
+      </p>
+
+      <div className="rounded-xl border border-gray-200 bg-white/70 p-3 min-h-[88px]">
+        <div className="text-[11px] text-gray-500 font-sf-pro mb-1">Prompt</div>
+        <div className="text-sm text-gray-800 font-sf-pro">
+          “I have 25 minutes and dumbbells. Build me a quick push workout.”
+        </div>
+      </div>
+      <div className="mt-3 flex justify-end">
+        <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white text-xs font-sf-pro hover:opacity-90">
+          Generate
+          <Wand2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AIChatPanel({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-lg p-4 sm:p-5 shadow-lg flex flex-col ${className}`}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center">
+          <MessageSquare className="w-4 h-4" />
+        </div>
+        <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+          AI Coach
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto space-y-3 pr-1">
+        {/* Assistant bubble */}
+        <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 p-3 text-sm text-gray-800 font-sf-pro">
+          Hi! I can help with plans, meals, and recovery. Here’s what I can do:
+          <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-700">
+            <li>Generate goal‑aligned workout plans</li>
+            <li>Analyze sets and suggest next weights</li>
+            <li>Plan meals to close macro gaps</li>
+            <li>Adapt to your schedule automatically</li>
+            <li>Transcribe and summarize voice notes</li>
+          </ul>
+        </div>
+        {/* User bubble */}
+        <div className="ml-auto max-w-[70%] rounded-2xl rounded-tr-sm bg-gray-900 text-white p-3 text-sm font-sf-pro">
+          I need a 3‑day split that fits 45 minutes per day.
+        </div>
+        {/* Assistant bubble */}
+        <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-white border border-gray-200 p-3 text-sm text-gray-800 font-sf-pro shadow-sm">
+          Great—here’s a quick outline. I’ll adjust volume based on your last
+          sessions and add progressions.
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center"
+          aria-label="Start voice input"
+        >
+          <Mic className="w-4 h-4" />
+        </button>
+        <div className="flex-1 h-10 rounded-xl bg-white border border-gray-200 flex items-center px-3">
+          <input
+            className="flex-1 outline-none text-sm font-sf-pro placeholder:text-gray-400"
+            placeholder="Message AI Coach"
+          />
+          <button
+            className="text-gray-700 hover:text-black"
+            aria-label="Send message"
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>
