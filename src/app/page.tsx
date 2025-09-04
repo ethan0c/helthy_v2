@@ -2,31 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-} from "framer-motion";
-import {
-  Activity,
-  Brain,
-  Target,
-  Zap,
-  Smartphone,
-  ChevronDown,
-  Check,
-  Palette,
-  Mail,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { motion, useScroll, AnimatePresence } from "framer-motion";
+import { Activity, Brain, Target, Zap, ChevronDown } from "lucide-react";
 
 export default function Home() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [isDynamicIslandVisible, setIsDynamicIslandVisible] = useState(true);
   const [email, setEmail] = useState("");
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { scrollYProgress } = useScroll();
 
@@ -94,6 +76,16 @@ export default function Home() {
       question: "What makes Helthy AI different?",
       answer:
         "Our AI learns from your specific habits and preferences, not just generic fitness data. It provides truly personalized recommendations that evolve with your journey.",
+    },
+    {
+      question: "Does Helthy integrate with wearables?",
+      answer:
+        "Yes. Helthy connects with popular devices and platforms to sync workouts, heart rate, and activity so your dashboard stays accurate and effortless.",
+    },
+    {
+      question: "Is there a free trial?",
+      answer:
+        "We offer a free trial so you can explore Helthy before committing. Join the waitlist to be notified when trials open in your region.",
     },
   ];
 
@@ -523,64 +515,56 @@ export default function Home() {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="py-20 px-4">
-          <div className="max-w-4xl mx-auto">
+        {/* FAQ Section - Dark mode layout inspired by the reference */}
+        <section id="faq" className="py-24 px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Top divider and meta row */}
+            <div className="border-t border-white/10 pt-10 flex items-center justify-between mb-10">
+              <span className="text-xs tracking-wider text-white/50 font-sf-pro uppercase">
+                FAQ
+              </span>
+              <span className="text-[10px] text-white/50 border border-white/20 rounded-full px-2 py-0.5">
+                03
+              </span>
+            </div>
+
             <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.7 }}
+              className="mb-14"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white font-playfair">
-                Frequently Asked{" "}
-                <span className="text-green-400">Questions</span>
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase font-sf-pro">
+                Frequently Asked Questions
               </h2>
+              <p className="mt-6 max-w-2xl text-sm sm:text-base text-white/60 font-sf-pro">
+                We’ve collected the most common questions to help you understand
+                how Helthy works. If you don’t see yours, reach out and we’ll
+                get you answers.
+              </p>
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {faqs.map((faq, index) => (
                 <motion.div
-                  key={index}
-                  className="bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700"
-                  initial={{ opacity: 0, y: 20 }}
+                  key={faq.question}
+                  initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors p-8 flex flex-col h-full"
                 >
-                  <button
-                    className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-700/30 transition-colors rounded-2xl"
-                    onClick={() =>
-                      setExpandedFaq(expandedFaq === index ? null : index)
-                    }
-                  >
-                    <span className="text-lg font-medium text-white font-sf-pro">
-                      {faq.question}
-                    </span>
-                    {expandedFaq === index ? (
-                      <Minus className="w-5 h-5 text-gray-400" />
-                    ) : (
-                      <Plus className="w-5 h-5 text-gray-400" />
-                    )}
-                  </button>
-                  <AnimatePresence>
-                    {expandedFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-4">
-                          <p className="text-gray-300 font-sf-pro">
-                            {faq.answer}
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className="text-6xl sm:text-7xl font-extrabold text-white/90 font-sf-pro">
+                    {(index + 1).toString().padStart(2, "0")}
+                    <span className="text-white/40">.</span>
+                  </div>
+                  <h3 className="mt-6 text-lg font-semibold text-white font-sf-pro">
+                    {faq.question}
+                  </h3>
+                  <p className="mt-4 text-sm leading-6 text-white/70 font-sf-pro">
+                    {faq.answer}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -592,12 +576,29 @@ export default function Home() {
           id="waitlist"
           className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
         >
-          {/* Gradient Background with Earth Curve */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-purple-900/20 to-black">
-            {/* Earth curve at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-64">
-              <div className="w-full h-full bg-gradient-to-t from-gray-800 via-gray-700 to-transparent rounded-t-full transform scale-x-150 origin-bottom"></div>
+          {/* Gradient Background with Earth Horizon */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0b0613] to-black">
+            {/* Horizon group */}
+            <div className="absolute bottom-0 left-0 right-0 h-[520px]">
+              {/* Atmosphere band above horizon (broad, very soft) */}
+              <div className="absolute bottom-[205px] left-1/2 -translate-x-1/2 w-[175%] h-48 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.45)_0%,rgba(187,148,255,0.18)_40%,rgba(0,0,0,0)_78%)] blur-[36px] opacity-95"></div>
+
+              {/* Very dark planet body (slightly larger ellipse for stronger arc) */}
+              <div className="absolute -bottom-28 left-1/2 -translate-x-1/2 w-[280%] h-[360px] rounded-t-[9999px] bg-black"></div>
+
+              {/* Rim core (thin, soft) */}
+              <div className="absolute bottom-[206px] left-1/2 -translate-x-1/2 w-[235%] h-px bg-gradient-to-r from-transparent via-white/70 to-transparent"></div>
+
+              {/* Rim bloom (wide, subtle tint and blur to blend) */}
+              <div className="absolute bottom-[204px] left-1/2 -translate-x-1/2 w-[240%] h-10 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,rgba(172,139,255,0.14)_40%,rgba(0,0,0,0)_80%)] blur-2xl"></div>
+
+              {/* Secondary atmospheric arcs (very faint to avoid harsh lines) */}
+              <div className="absolute bottom-[214px] left-1/2 -translate-x-1/2 w-[210%] h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              <div className="absolute bottom-[222px] left-1/2 -translate-x-1/2 w-[190%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
             </div>
+
+            {/* Edge vignette for stronger planet silhouette */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_42%,rgba(0,0,0,0.28)_86%,rgba(0,0,0,0.55)_100%)]"></div>
           </div>
 
           <div className="relative z-10 max-w-2xl mx-auto text-center">
@@ -607,29 +608,24 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              {/* Small indicator */}
-              <div className="flex items-center justify-center gap-2 mb-8">
-                <span className="text-gray-400 text-sm font-sf-pro">
-                  Waitlist ⭐ Framer Template
-                </span>
-              </div>
-
-              {/* Main heading - exactly like reference */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-white mb-4 leading-tight">
-                <span className="font-light">Good things come</span>
+              {/* Main heading - SF Pro with Playfair for "who wait" */}
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-4 leading-tight font-sf-pro tracking-tight">
+                <span className="font-medium">Good things come</span>
                 <br />
-                <span className="font-light">to those </span>
-                <span className="italic font-light">who wait.</span>
+                <span className="font-medium">to those </span>
+                <span className="italic font-light font-playfair">
+                  who wait.
+                </span>
               </h1>
 
               {/* Subtitle */}
               <p className="text-gray-400 text-lg mb-12 max-w-lg mx-auto font-sf-pro font-light leading-relaxed">
-                Launch your very own waitlist, grow your mailing list all while
-                building the hype for launch day.
+                Be among the first to experience the future of fitness. Get
+                early access and exclusive updates.
               </p>
 
               {/* Email form */}
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="Your Email Address"
@@ -645,28 +641,16 @@ export default function Home() {
                   Get Notified
                 </motion.button>
               </div>
-
-              {/* Attribution */}
-              <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
-                <span className="font-sf-pro">Created by</span>
-                <span className="text-white font-sf-pro">🤍 Hamza Ehsan</span>
-              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Final Footer */}
-        <footer className="py-12 px-4 border-t border-gray-800">
+        {/* Simple Footer */}
+        <footer className="py-8 px-4 bg-black border-t border-gray-800">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="text-2xl font-bold mb-4 text-white font-playfair">
-              Helthy
-            </div>
-            <p className="text-gray-400 font-sf-pro">
-              The future of fitness is here
-            </p>
-            <div className="mt-8 text-gray-500 text-sm font-sf-pro">
+            <p className="text-gray-400 font-sf-pro text-sm">
               © 2025 Helthy. All rights reserved.
-            </div>
+            </p>
           </div>
         </footer>
       </div>
