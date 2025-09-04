@@ -94,21 +94,16 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Auto-expand AI when the trigger is in view; collapse when out of view (unless user manually closed)
+  // Auto-expand AI when the trigger is in view; stay expanded until user manually closes
   useEffect(() => {
     if (aiTriggerInView && !aiManualCollapsed) {
       setAiExpanded(true);
-    } else if (!aiTriggerInView && !aiManualCollapsed) {
-      setAiExpanded(false);
     }
+    // Removed auto-collapse when out of view - let it stay expanded until user closes
   }, [aiTriggerInView, aiManualCollapsed]);
 
-  // Reset manual collapse flag once the trigger leaves view so it can auto-expand next time
-  useEffect(() => {
-    if (!aiTriggerInView && aiManualCollapsed) {
-      setAiManualCollapsed(false);
-    }
-  }, [aiTriggerInView, aiManualCollapsed]);
+  // Keep manual collapse state persistent - don't reset it automatically
+  // This ensures once user closes AI, it stays closed until they manually open it again
 
   // Themes as planets in the solar system
   const themePlanets = [
@@ -325,94 +320,21 @@ export default function Home() {
                       Good morning, Alex
                     </h3>
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6 font-playfair leading-tight">
-                      Ready to crush{" "}
+                      Stop guessing.{" "}
                       <span className="bg-gradient-to-r from-slate-700 via-gray-800 to-zinc-900 bg-clip-text text-transparent italic">
-                        today's goals?
+                        Start knowing.
                       </span>
                     </h1>
-                    <p className="text-xl md:text-2xl text-gray-600 font-sf-pro font-light max-w-2xl mx-auto leading-relaxed">
-                      Your AI-powered companion for smarter fitness, better
-                      nutrition, and faster results.
+                    <p className="text-xl md:text-2xl text-gray-600 font-sf-pro font-light max-w-3xl mx-auto leading-relaxed">
+                      Every workout you do without data is a missed opportunity.
+                      Every meal you eat without tracking is progress left on
+                      the table. Helthy gives you the insights you need to
+                      finally break through plateaus and achieve the results
+                      you've been chasing.
                     </p>
                   </div>
 
-                  {/* Quick Stats Dashboard */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                    <motion.div
-                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="text-left">
-                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                            Calories Left
-                          </p>
-                          <p className="text-4xl font-bold text-gray-900 font-sf-pro">
-                            1,247
-                          </p>
-                          <p className="text-xs text-green-600 font-sf-pro font-medium">
-                            On track
-                          </p>
-                        </div>
-                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center shadow-lg">
-                          <Target className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="text-left">
-                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                            Today's Focus
-                          </p>
-                          <p className="text-2xl font-bold text-gray-900 font-sf-pro">
-                            Upper Body
-                          </p>
-                          <p className="text-xs text-orange-600 font-sf-pro font-medium">
-                            45 min planned
-                          </p>
-                        </div>
-                        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                          <Zap className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      className="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200/50"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="text-left">
-                          <p className="text-sm text-gray-500 font-sf-pro font-medium">
-                            AI Suggests
-                          </p>
-                          <p className="text-xl font-bold text-gray-900 font-sf-pro">
-                            Post-lunch walk
-                          </p>
-                          <p className="text-xs text-purple-600 font-sf-pro font-medium">
-                            20 min boost
-                          </p>
-                        </div>
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
-                          <Brain className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
+                  {/* Quick Stats Dashboard removed per request */}
 
                   {/* Main CTA */}
                   <motion.div
@@ -456,56 +378,85 @@ export default function Home() {
             </section>
 
             {/* Features Section - Inside iPhone */}
-            <section id="features" className="py-20 px-4 bg-white">
-              <div className="max-w-6xl mx-auto">
+            <section
+              id="features"
+              className="py-20 px-4 relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-50"
+            >
+              {/* Subtle gradient that blends into AI section */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white/0"></div>
+              </div>
+
+              <div className="max-w-6xl mx-auto relative z-10">
                 <SectionMeta label="Features" number="02" tone="light" />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                  {/* Left: Exercise expanded view (tall) */}
+
+                {/* Features description */}
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-playfair">
+                    Everything you need to succeed
+                  </h2>
+                  <p className="text-lg text-gray-600 font-sf-pro max-w-3xl mx-auto">
+                    Create custom workouts, track your progress, plan meals, and
+                    get AI-powered insights—all in one intelligent platform
+                    designed for real results.
+                  </p>
+                </div>
+
+                {/* Updated layout: Single exercise card on left, Food card on right */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                  {/* Left: Single Exercise card */}
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                   >
-                    <ExerciseCard className="h-[520px]" />
+                    <ExerciseCard
+                      title="Exercise"
+                      description="Create custom workouts, track progress, and analyze performance with detailed metrics"
+                      exercise="Barbell Bench Press"
+                      stats="4 sets • 8 reps • 155 lb"
+                      image="/exercise/newexercise.jpeg"
+                      imageAlt="Current bench press form"
+                    />
                   </motion.div>
 
-                  {/* Middle: AI insights (bottom-aligned) */}
-                  {!aiExpanded && (
-                    <motion.div
-                      className="lg:self-end cursor-pointer"
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.1 }}
-                      onClick={() => {
-                        setAiExpanded(true);
-                        // smooth scroll to AI section to highlight the expansion
-                        setTimeout(() => {
-                          document.getElementById("ai")?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                        }, 50);
-                      }}
-                      aria-label="Expand AI features"
-                    >
-                      <motion.div layoutId="ai-insights">
-                        <AIInsightsCard className="h-[280px]" />
-                      </motion.div>
-                    </motion.div>
-                  )}
-
-                  {/* Right: Food section (taller than exercise) */}
+                  {/* Right: Food card */}
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.15 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
                   >
-                    <FoodCard className="h-[640px]" />
+                    <FoodCard />
                   </motion.div>
                 </div>
+
+                {/* Bottom row: AI insights (full width) */}
+                {!aiExpanded && (
+                  <motion.div
+                    className="cursor-pointer"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    onClick={() => {
+                      setAiExpanded(true);
+                      // smooth scroll to AI section to highlight the expansion
+                      setTimeout(() => {
+                        document.getElementById("ai")?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }, 50);
+                    }}
+                    aria-label="Expand AI features"
+                  >
+                    <motion.div layoutId="ai-insights">
+                      <AIInsightsCard />
+                    </motion.div>
+                  </motion.div>
+                )}
               </div>
             </section>
 
@@ -755,107 +706,57 @@ export default function Home() {
 }
 
 // ==== Feature Cards (Exercise, AI Insights, Food) ====
-function ExerciseCard({ className = "" }: { className?: string }) {
+function ExerciseCard({
+  className = "",
+  title = "Exercise",
+  description = "Create and track workouts with precision",
+  exercise = "Barbell Bench Press",
+  stats = "4 sets • 8 reps • 155 lb",
+  image = "/exercise/newexercise.jpeg",
+  imageAlt = "Exercise routine",
+}: {
+  className?: string;
+  title?: string;
+  description?: string;
+  exercise?: string;
+  stats?: string;
+  image?: string;
+  imageAlt?: string;
+}) {
   return (
     <div
-      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+      className={`bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col ${className}`}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center">
-            <Activity className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-semibold text-gray-900 font-sf-pro">
-            Exercise
-          </h3>
+      {/* Header with description (clean, no icon chip) */}
+      <div className="mb-4">
+        <div className="text-[11px] uppercase tracking-wide text-gray-500 font-sf-pro">
+          Workouts
         </div>
-        <span className="text-[10px] text-gray-500 font-sf-pro uppercase tracking-wider">
-          Today
-        </span>
-      </div>
-      <p className="text-gray-600 text-sm font-sf-pro mb-4">
-        Expanded view of your current exercise with sets and rest.
-      </p>
-
-      {/* Exercise photos */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-gray-300 shadow-sm">
-          <Image
-            src="/exercise/IMG_6893.jpeg"
-            alt="Exercise photo 1"
-            fill
-            sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover"
-            priority={false}
-          />
-        </div>
-        <div className="relative w-full h-32 rounded-2xl overflow-hidden border border-gray-300 shadow-sm">
-          <Image
-            src="/exercise/IMG_6895.jpeg"
-            alt="Exercise photo 2"
-            fill
-            sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover"
-            priority={false}
-          />
-        </div>
+        <h3 className="text-xl font-semibold text-gray-900 font-sf-pro">
+          {title}
+        </h3>
+        <p className="text-gray-600 text-sm font-sf-pro mt-1">{description}</p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white/60 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <div className="text-xs text-gray-500 font-sf-pro">Exercise</div>
-            <div className="text-lg font-semibold text-gray-900 font-sf-pro">
-              Barbell Bench Press
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-gray-500 font-sf-pro">Target</div>
-            <div className="text-sm font-medium text-gray-800 font-sf-pro">
-              Chest • Triceps
-            </div>
-          </div>
-        </div>
-        <div className="h-px bg-gray-200 my-3" />
-        <div
-          className="space-y-3 overflow-auto pr-1"
-          style={{ scrollbarWidth: "thin" }}
-        >
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full border border-gray-300 bg-white flex items-center justify-center text-[11px] text-gray-600 font-sf-pro">
-                  {n}
-                </div>
-                <div className="text-sm text-gray-800 font-sf-pro">
-                  8 reps <span className="text-gray-400">@</span> 155 lb
-                </div>
-              </div>
-              <div className="text-xs text-gray-500 font-sf-pro">Rest 90s</div>
-            </div>
-          ))}
-        </div>
+      {/* Main content: Single exercise photo */}
+      <div className="relative w-full rounded-2xl overflow-hidden border border-gray-100 mb-4">
+        <Image
+          src={image}
+          alt={imageAlt}
+          width={400}
+          height={300}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="w-full h-auto object-contain"
+          priority={false}
+        />
       </div>
 
-      <div className="mt-auto pt-4 grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
-          <div className="text-[10px] text-gray-500 font-sf-pro">Volume</div>
-          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
-            4,960 lb
-          </div>
+      {/* Current workout example */}
+      <div className="text-center">
+        <div className="text-base font-medium text-gray-900 font-sf-pro mb-1">
+          {exercise}
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
-          <div className="text-[10px] text-gray-500 font-sf-pro">RPE</div>
-          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
-            7.5
-          </div>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
-          <div className="text-[10px] text-gray-500 font-sf-pro">Last PR</div>
-          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
-            185 lb
-          </div>
-        </div>
+        <div className="text-sm text-gray-500 font-sf-pro">{stats}</div>
       </div>
     </div>
   );
@@ -895,74 +796,42 @@ function AIInsightsCard({ className = "" }: { className?: string }) {
 function FoodCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+      className={`bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col ${className}`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-gray-900 font-sf-pro">
-          Food
+      {/* Header with description (clean, no icon chip) */}
+      <div className="mb-4">
+        <div className="text-[11px] uppercase tracking-wide text-gray-500 font-sf-pro">
+          Nutrition
+        </div>
+        <h3 className="text-xl font-semibold text-gray-900 font-sf-pro">
+          Meal Planning
         </h3>
-        <span className="text-[10px] text-gray-500 font-sf-pro uppercase tracking-wider">
-          Macros
-        </span>
+        <p className="text-gray-600 text-sm font-sf-pro mt-1">
+          Plan meals, track macros, and hit your goals with smart
+          recommendations
+        </p>
       </div>
-      <p className="text-gray-600 text-sm font-sf-pro mb-4">
-        Plan meals and macros with zero friction.
-      </p>
 
-      {/* Food image */}
-      <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-gray-300 shadow-sm mb-4">
+      {/* Main content: Food photo */}
+      <div className="relative w-full rounded-2xl overflow-hidden border border-gray-100 mb-4">
         <Image
           src="/food/foodcards.jpg"
-          alt="Food preview"
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover"
+          alt="Food planning and meal preparation"
+          width={400}
+          height={250}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="w-full h-auto object-contain"
           priority={false}
         />
       </div>
 
-      <div className="space-y-4">
-        {/* Macro bars */}
-        {[
-          { k: "Protein", c: "bg-emerald-500", v: 68 },
-          { k: "Carbs", c: "bg-sky-500", v: 52 },
-          { k: "Fat", c: "bg-amber-500", v: 34 },
-        ].map((m) => (
-          <div key={m.k} className="">
-            <div className="flex items-center justify-between text-xs text-gray-600 font-sf-pro mb-1">
-              <span>{m.k}</span>
-              <span>{m.v}%</span>
-            </div>
-            <div className="h-2.5 rounded-full bg-gray-200 overflow-hidden">
-              <div className={`h-full ${m.c}`} style={{ width: `${m.v}%` }} />
-            </div>
-          </div>
-        ))}
-
-        {/* Meals grid */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          {["Breakfast", "Lunch", "Snack", "Dinner"].map((meal) => (
-            <div
-              key={meal}
-              className="rounded-2xl border border-gray-200 bg-white/60 p-4"
-            >
-              <div className="text-[11px] text-gray-500 font-sf-pro mb-1">
-                {meal}
-              </div>
-              <div className="text-sm font-semibold text-gray-900 font-sf-pro">
-                + Add item
-              </div>
-            </div>
-          ))}
+      {/* Current progress example */}
+      <div className="text-center">
+        <div className="text-base font-medium text-gray-900 font-sf-pro mb-1">
+          Today's Progress
         </div>
-      </div>
-
-      <div className="mt-auto pt-4">
-        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 flex items-center justify-between">
-          <div className="text-[10px] text-gray-500 font-sf-pro">Calories</div>
-          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
-            1,420 / 2,100
-          </div>
+        <div className="text-sm text-gray-500 font-sf-pro">
+          1,420 / 2,100 calories
         </div>
       </div>
     </div>
