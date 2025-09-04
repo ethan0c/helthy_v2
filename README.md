@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Helthy - AI-Powered Fitness Companion
+
+A modern, premium website for Helthy - the AI-powered fitness companion that transforms how you reach your health goals.
+
+## Features
+
+✨ **Modern Design**: Premium dark-first design with smooth animations and glass morphism effects
+🎯 **Dynamic Island Navigation**: iPhone-inspired navigation that transforms as you scroll
+🤖 **AI Showcase**: Dedicated section highlighting Helthy AI as your personal fitness copilot
+🎨 **Six Unique Themes**: Beautiful theme preview with interactive animations
+📱 **Mobile-First**: Responsive design optimized for all devices
+⚡ **Smooth Scrolling**: Seamless scroll-based storytelling experience
+
+## Sections
+
+- **Hero**: Bold introduction with gradient text and premium animations
+- **Features**: Smart Analytics, Goal Tracking, and Instant Insights
+- **AI**: Showcasing Helthy AI capabilities with interactive preview
+- **Themes**: Six customizable themes (Midnight, Ocean, Forest, Sunset, Purple, Rose)
+- **FAQ**: Expandable FAQ section with smooth animations
+- **Waitlist**: Premium call-to-action with email signup
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ installed
+- npm or yarn package manager
+
+### Installation
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Available Scripts
+
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## Design Philosophy
+
+The Helthy website emphasizes:
+
+- **Premium aesthetics** with dark-first design
+- **Fluid animations** that enhance user experience
+- **Mobile-first approach** for optimal mobile performance
+- **Storytelling flow** that guides users through the product journey
+- **Interactive elements** that engage and delight users
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── globals.css      # Global styles and animations
+│   ├── layout.tsx       # Root layout with metadata
+│   └── page.tsx         # Main landing page
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key Animations
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Dynamic Island navbar transformation
+- Smooth scroll-triggered reveals
+- Hover effects with scale and glow
+- Interactive theme previews
+- Expandable FAQ sections
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Browser Support
 
-## Learn More
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+© 2025 Helthy. All rights reserved.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ for the future of fitness
