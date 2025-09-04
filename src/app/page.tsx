@@ -3,7 +3,41 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
-import { Activity, Brain, Target, Zap, ChevronDown } from "lucide-react";
+import { Activity, Brain, Target, Zap, ChevronDown, X } from "lucide-react";
+
+// Reusable small top meta row with divider, label, and number bubble
+function SectionMeta({
+  label,
+  number,
+  tone = "dark",
+  className = "",
+}: {
+  label: string;
+  number: string;
+  tone?: "light" | "dark";
+  className?: string;
+}) {
+  const border = tone === "dark" ? "border-white/10" : "border-gray-200";
+  const text = tone === "dark" ? "text-white/50" : "text-gray-500";
+  const bubbleBorder = tone === "dark" ? "border-white/20" : "border-gray-300";
+  const bubbleText = tone === "dark" ? "text-white/60" : "text-gray-600";
+  return (
+    <div
+      className={`border-t ${border} pt-6 flex items-center justify-between mb-8 ${className}`}
+    >
+      <span
+        className={`text-[10px] tracking-wider ${text} font-sf-pro uppercase`}
+      >
+        {label}
+      </span>
+      <span
+        className={`text-[10px] ${bubbleText} border ${bubbleBorder} rounded-full px-2 py-0.5`}
+      >
+        {number}
+      </span>
+    </div>
+  );
+}
 
 export default function Home() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
@@ -35,26 +69,58 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  const themes = [
+  // Themes as planets in the solar system
+  const themePlanets = [
     {
-      name: "Midnight",
-      color: "from-slate-900 to-slate-700",
-      accent: "#6366f1",
+      key: "ocean",
+      name: "Ocean",
+      tagline: "Calm & Focused",
+      gradient: "from-sky-500 via-cyan-400 to-teal-300",
+      accent: "#06b6d4",
     },
-    { name: "Ocean", color: "from-blue-900 to-cyan-700", accent: "#06b6d4" },
     {
-      name: "Forest",
-      color: "from-green-900 to-emerald-700",
+      key: "emerald",
+      name: "Emerald",
+      tagline: "Natural & Refreshing",
+      gradient: "from-emerald-500 via-green-500 to-teal-400",
       accent: "#10b981",
     },
-    { name: "Sunset", color: "from-orange-900 to-red-700", accent: "#f97316" },
     {
-      name: "Purple",
-      color: "from-purple-900 to-violet-700",
-      accent: "#8b5cf6",
+      key: "hello",
+      name: "Hello",
+      tagline: "Creative & Inspiring",
+      gradient: "from-fuchsia-500 via-pink-500 to-rose-400",
+      accent: "#e879f9",
     },
-    { name: "Rose", color: "from-pink-900 to-rose-700", accent: "#ec4899" },
-  ];
+    {
+      key: "dark",
+      name: "Dark",
+      tagline: "Sleek & Modern",
+      gradient: "from-zinc-700 via-neutral-800 to-black",
+      accent: "#a3a3a3",
+    },
+    {
+      key: "light",
+      name: "Light",
+      tagline: "Clean & Professional",
+      gradient: "from-white via-slate-100 to-slate-200",
+      accent: "#e5e7eb",
+    },
+    {
+      key: "sunset",
+      name: "Sunset",
+      tagline: "Energetic & Warm",
+      gradient: "from-orange-500 via-amber-400 to-rose-400",
+      accent: "#f59e0b",
+    },
+    {
+      key: "midnight",
+      name: "Midnight",
+      tagline: "Mysterious & Modern",
+      gradient: "from-indigo-700 via-violet-700 to-slate-900",
+      accent: "#6366f1",
+    },
+  ] as const;
 
   const faqs = [
     {
@@ -202,6 +268,12 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
               >
+                <SectionMeta
+                  label="Home"
+                  number="01"
+                  tone="light"
+                  className="text-left"
+                />
                 {/* Status Bar Space */}
                 <div className="h-8"></div>
 
@@ -344,62 +416,38 @@ export default function Home() {
           {/* Features Section - Inside iPhone */}
           <section id="features" className="py-20 px-4 bg-white">
             <div className="max-w-6xl mx-auto">
-              <motion.div
-                className="text-center mb-16"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 font-playfair">
-                  Reach Your Goals{" "}
-                  <span className="text-indigo-600">Faster</span>
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto font-sf-pro">
-                  Track analytics, meals, and workouts with intelligent insights
-                  that adapt to your lifestyle
-                </p>
-              </motion.div>
+              <SectionMeta label="Features" number="02" tone="light" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                {/* Left: Exercise expanded view (tall) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <ExerciseCard className="h-[520px]" />
+                </motion.div>
 
-              <div className="grid md:grid-cols-3 gap-8">
-                {[
-                  {
-                    icon: <Activity className="w-8 h-8" />,
-                    title: "Smart Analytics",
-                    description:
-                      "Track your progress with detailed analytics that reveal patterns and optimize your routines",
-                  },
-                  {
-                    icon: <Target className="w-8 h-8" />,
-                    title: "Goal Tracking",
-                    description:
-                      "Set and achieve personalized goals with AI-powered recommendations and milestone celebrations",
-                  },
-                  {
-                    icon: <Zap className="w-8 h-8" />,
-                    title: "Instant Insights",
-                    description:
-                      "Get real-time feedback on your workouts, nutrition, and recovery to maximize results",
-                  },
-                ].map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    className="bg-gray-50 border border-gray-100 rounded-2xl p-8 hover:bg-gray-100 hover:shadow-lg transition-all duration-300"
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: index * 0.2 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <div className="text-indigo-600 mb-4">{feature.icon}</div>
-                    <h3 className="text-xl font-bold mb-3 text-gray-900 font-sf-pro">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 font-sf-pro">
-                      {feature.description}
-                    </p>
-                  </motion.div>
-                ))}
+                {/* Middle: AI insights (bottom-aligned) */}
+                <motion.div
+                  className="lg:self-end"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  <AIInsightsCard className="h-[280px]" />
+                </motion.div>
+
+                {/* Right: Food section (taller than exercise) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
+                >
+                  <FoodCard className="h-[640px]" />
+                </motion.div>
               </div>
             </div>
           </section>
@@ -409,61 +457,27 @@ export default function Home() {
             id="ai"
             className="py-20 px-4 bg-gradient-to-br from-gray-50 to-white"
           >
-            <div className="max-w-6xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 font-playfair">
-                  AI-Powered{" "}
-                  <span className="text-purple-600">Intelligence</span>
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12 font-sf-pro">
-                  Experience the future of fitness with our advanced AI that
-                  learns from your habits
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-12 items-center">
-                  <div className="text-left">
-                    <div className="space-y-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                          <Brain className="w-6 h-6 text-purple-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 font-sf-pro">
-                            Smart Recommendations
-                          </h3>
-                          <p className="text-gray-600 font-sf-pro">
-                            AI analyzes your progress and suggests personalized
-                            workouts
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                          <Target className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 font-sf-pro">
-                            Adaptive Goals
-                          </h3>
-                          <p className="text-gray-600 font-sf-pro">
-                            Goals that evolve with your fitness journey
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <div className="w-80 h-80 bg-gradient-to-br from-purple-400 to-blue-500 rounded-3xl mx-auto flex items-center justify-center">
-                      <Brain className="w-32 h-32 text-white" />
-                    </div>
-                  </div>
+            <div className="max-w-6xl mx-auto">
+              <SectionMeta label="AI" number="03" tone="light" />
+              {/* Placeholder structure; content to be refined once details are provided */}
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200">
+                  <h3 className="text-gray-900 font-sf-pro font-semibold mb-2">
+                    AI Capabilities
+                  </h3>
+                  <p className="text-gray-600 font-sf-pro text-sm">
+                    We’ll showcase core AI features here once you share details.
+                  </p>
                 </div>
-              </motion.div>
+                <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-gray-200">
+                  <h3 className="text-gray-900 font-sf-pro font-semibold mb-2">
+                    Personalization
+                  </h3>
+                  <p className="text-gray-600 font-sf-pro text-sm">
+                    A compact demo of how insights adapt to users over time.
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -471,62 +485,42 @@ export default function Home() {
 
       {/* Outside iPhone Screen - Dark Background Sections */}
       <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
-        {/* Themes Section */}
-        <section id="themes" className="py-20 px-4">
-          <div className="max-w-6xl mx-auto">
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 50 }}
+        {/* Themes Section - Solar system with orbiting planets */}
+        <section id="themes" className="py-28 px-4 relative overflow-hidden">
+          <div className="max-w-6xl mx-auto text-center mb-16">
+            <SectionMeta
+              label="Themes"
+              number="04"
+              tone="dark"
+              className="text-left"
+            />
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase font-sf-pro"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white font-playfair">
-                Beautiful <span className="text-indigo-400">Themes</span>
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto font-sf-pro">
-                Customize your experience with stunning themes that match your
-                style
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {themes.map((theme, index) => (
-                <motion.div
-                  key={index}
-                  className="relative overflow-hidden rounded-2xl h-32 cursor-pointer group"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <div
-                    className={`w-full h-full bg-gradient-to-br ${theme.color}`}
-                  ></div>
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                    <span className="text-white font-bold text-lg font-sf-pro">
-                      {theme.name}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+              Themes In Orbit
+            </motion.h2>
+            <p className="text-white/70 font-sf-pro max-w-2xl mx-auto">
+              Hover or click a planet to preview the app in that theme.
+            </p>
           </div>
+
+          {/* Orbit system */}
+          <OrbitingThemes planets={themePlanets} />
         </section>
+
+        {/* Transition band: Themes → FAQ */}
+        <div aria-hidden className="relative h-16 sm:h-20">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent opacity-[0.18]"></div>
+        </div>
 
         {/* FAQ Section - Dark mode layout inspired by the reference */}
         <section id="faq" className="py-24 px-4">
           <div className="max-w-6xl mx-auto">
-            {/* Top divider and meta row */}
-            <div className="border-t border-white/10 pt-10 flex items-center justify-between mb-10">
-              <span className="text-xs tracking-wider text-white/50 font-sf-pro uppercase">
-                FAQ
-              </span>
-              <span className="text-[10px] text-white/50 border border-white/20 rounded-full px-2 py-0.5">
-                03
-              </span>
-            </div>
+            <SectionMeta label="FAQ" number="05" tone="dark" />
 
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -571,6 +565,11 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Transition band: FAQ → Waitlist */}
+        <div aria-hidden className="relative h-24 sm:h-28">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black"></div>
+        </div>
+
         {/* Waitlist Section - Matching reference design */}
         <section
           id="waitlist"
@@ -608,6 +607,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
+              <SectionMeta label="Waitlist" number="06" tone="dark" />
               {/* Main heading - SF Pro with Playfair for "who wait" */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-4 leading-tight font-sf-pro tracking-tight">
                 <span className="font-medium">Good things come</span>
@@ -655,5 +655,416 @@ export default function Home() {
         </footer>
       </div>
     </>
+  );
+}
+
+// ==== Feature Cards (Exercise, AI Insights, Food) ====
+function ExerciseCard({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center">
+            <Activity className="w-4 h-4" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-900 font-sf-pro">
+            Exercise
+          </h3>
+        </div>
+        <span className="text-[10px] text-gray-500 font-sf-pro uppercase tracking-wider">
+          Today
+        </span>
+      </div>
+      <p className="text-gray-600 text-sm font-sf-pro mb-4">
+        Expanded view of your current exercise with sets and rest.
+      </p>
+
+      <div className="rounded-2xl border border-gray-200 bg-white/60 p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <div className="text-xs text-gray-500 font-sf-pro">Exercise</div>
+            <div className="text-lg font-semibold text-gray-900 font-sf-pro">
+              Barbell Bench Press
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs text-gray-500 font-sf-pro">Target</div>
+            <div className="text-sm font-medium text-gray-800 font-sf-pro">
+              Chest • Triceps
+            </div>
+          </div>
+        </div>
+        <div className="h-px bg-gray-200 my-3" />
+        <div
+          className="space-y-3 overflow-auto pr-1"
+          style={{ scrollbarWidth: "thin" }}
+        >
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full border border-gray-300 bg-white flex items-center justify-center text-[11px] text-gray-600 font-sf-pro">
+                  {n}
+                </div>
+                <div className="text-sm text-gray-800 font-sf-pro">
+                  8 reps <span className="text-gray-400">@</span> 155 lb
+                </div>
+              </div>
+              <div className="text-xs text-gray-500 font-sf-pro">Rest 90s</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto pt-4 grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
+          <div className="text-[10px] text-gray-500 font-sf-pro">Volume</div>
+          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+            4,960 lb
+          </div>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
+          <div className="text-[10px] text-gray-500 font-sf-pro">RPE</div>
+          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+            7.5
+          </div>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 text-center">
+          <div className="text-[10px] text-gray-500 font-sf-pro">Last PR</div>
+          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+            185 lb
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AIInsightsCard({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center">
+          <Brain className="w-4 h-4" />
+        </div>
+        <h3 className="text-sm font-semibold text-gray-900 font-sf-pro">
+          AI Insights
+        </h3>
+      </div>
+      <p className="text-gray-600 text-sm font-sf-pro mb-4">
+        The key to Helthy—personal guidance shaped by your day.
+      </p>
+
+      <div className="mt-auto">
+        <div className="rounded-2xl border border-gray-200 bg-white/60 p-4">
+          <div className="text-xs text-gray-500 font-sf-pro mb-1">
+            Today’s Focus
+          </div>
+          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+            Protein gap: 22g • Add a Greek yogurt
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FoodCard({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`bg-white/70 backdrop-blur-lg rounded-3xl border border-gray-200 shadow-lg p-6 flex flex-col ${className}`}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-semibold text-gray-900 font-sf-pro">
+          Food
+        </h3>
+        <span className="text-[10px] text-gray-500 font-sf-pro uppercase tracking-wider">
+          Macros
+        </span>
+      </div>
+      <p className="text-gray-600 text-sm font-sf-pro mb-4">
+        Plan meals and macros with zero friction.
+      </p>
+
+      <div className="space-y-4">
+        {/* Macro bars */}
+        {[
+          { k: "Protein", c: "bg-emerald-500", v: 68 },
+          { k: "Carbs", c: "bg-sky-500", v: 52 },
+          { k: "Fat", c: "bg-amber-500", v: 34 },
+        ].map((m) => (
+          <div key={m.k} className="">
+            <div className="flex items-center justify-between text-xs text-gray-600 font-sf-pro mb-1">
+              <span>{m.k}</span>
+              <span>{m.v}%</span>
+            </div>
+            <div className="h-2.5 rounded-full bg-gray-200 overflow-hidden">
+              <div className={`h-full ${m.c}`} style={{ width: `${m.v}%` }} />
+            </div>
+          </div>
+        ))}
+
+        {/* Meals grid */}
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          {["Breakfast", "Lunch", "Snack", "Dinner"].map((meal) => (
+            <div
+              key={meal}
+              className="rounded-2xl border border-gray-200 bg-white/60 p-4"
+            >
+              <div className="text-[11px] text-gray-500 font-sf-pro mb-1">
+                {meal}
+              </div>
+              <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+                + Add item
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto pt-4">
+        <div className="rounded-xl border border-gray-200 bg-white/60 p-3 flex items-center justify-between">
+          <div className="text-[10px] text-gray-500 font-sf-pro">Calories</div>
+          <div className="text-sm font-semibold text-gray-900 font-sf-pro">
+            1,420 / 2,100
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==== Orbiting Themes (Solar System) ====
+type Planet = {
+  key: string;
+  name: string;
+  tagline: string;
+  gradient: string; // tailwind gradient stops
+  accent: string;
+};
+
+function OrbitingThemes({ planets }: { planets: readonly Planet[] }) {
+  const [active, setActive] = useState<Planet | null>(null);
+  const [paused, setPaused] = useState(false);
+
+  // ring radii and speeds (seconds per revolution)
+  const rings = [
+    { radius: 180, speed: 26 },
+    { radius: 260, speed: 34 },
+    { radius: 340, speed: 42 },
+  ];
+
+  // distribute planets across rings
+  const sizes = [60, 52, 68, 48, 64, 72, 56]; // planet diameters in px
+  const assignments = planets.map((p, i) => ({
+    planet: p,
+    ring: rings[i % rings.length],
+    start: (i * 360) / planets.length,
+    diameter: sizes[i % sizes.length],
+  }));
+
+  return (
+    <div
+      className="relative mx-auto w-full max-w-[1200px] h-[680px] flex items-center justify-center [perspective:1200px]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(Boolean(active))}
+    >
+      {/* central star glow */}
+      <div className="absolute w-40 h-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.15)_55%,rgba(255,255,255,0)_70%)]"></div>
+      {/* subtle solar corona */}
+      <div className="absolute w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.04)_55%,rgba(255,255,255,0)_70%)]"></div>
+
+      {/* orbit rings */}
+      <div
+        className="absolute left-1/2 top-1/2"
+        style={{ transform: "translate(-50%, -50%) rotateX(55deg)" }}
+      >
+        {rings.map((r, idx) => (
+          <div
+            key={idx}
+            className="absolute rounded-full border border-white/10"
+            style={{
+              width: r.radius * 2,
+              height: r.radius * 2,
+              left: -r.radius,
+              top: -r.radius,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* planets */}
+      {assignments.map(({ planet, ring, start, diameter }, i) => (
+        <PlanetOnOrbit
+          key={planet.key}
+          planet={planet}
+          radius={ring.radius}
+          speed={ring.speed}
+          startDeg={start}
+          diameter={diameter}
+          paused={paused || Boolean(active)}
+          onActivate={() => {
+            setActive(planet);
+            setPaused(true);
+          }}
+        />
+      ))}
+
+      {/* legend */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white/50 text-xs font-sf-pro">
+        Hover or click to pause orbit
+      </div>
+
+      <ThemeModal planet={active} onClose={() => setActive(null)} />
+    </div>
+  );
+}
+
+function PlanetOnOrbit({
+  planet,
+  radius,
+  speed,
+  startDeg,
+  diameter,
+  paused,
+  onActivate,
+}: {
+  planet: Planet;
+  radius: number;
+  speed: number; // seconds per 360 deg
+  startDeg: number;
+  diameter: number;
+  paused: boolean;
+  onActivate: () => void;
+}) {
+  const [hover, setHover] = useState(false);
+  const duration = speed;
+
+  return (
+    <motion.div
+      className="absolute [transform-style:preserve-3d]"
+      style={{ width: radius * 2, height: radius * 2 }}
+      animate={paused ? { rotate: startDeg } : { rotate: 360 + startDeg }}
+      initial={{ rotate: startDeg }}
+      transition={{ repeat: Infinity, ease: "linear", duration }}
+    >
+      <div
+        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)]"
+        style={{ transform: `translate(${radius}px, -50%)` }}
+      >
+        <button
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onClick={onActivate}
+          className="group relative"
+          aria-label={`${planet.name} theme`}
+        >
+          {/* planet body with 3D lighting */}
+          <div
+            className={`relative rounded-full bg-gradient-to-br ${planet.gradient} shadow-[0_0_24px_rgba(255,255,255,0.15)] border border-white/10`}
+            style={{ width: diameter, height: diameter }}
+          >
+            {/* highlight */}
+            <div className="absolute -top-1 -left-1 w-10 h-10 rounded-full bg-white/25 blur-md" />
+            {/* limb shadow */}
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_70%_80%,transparent_40%,rgba(0,0,0,0.35)_75%)]" />
+            {/* drop shadow to plane */}
+            <div
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-2 rounded-full bg-black/40 blur-md"
+              style={{ width: Math.max(24, diameter * 0.6) }}
+            />
+          </div>
+
+          {/* label */}
+          <div className="absolute left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap text-center">
+            <div className="text-white text-sm font-semibold font-sf-pro">
+              {planet.name}
+            </div>
+            <div className="text-white/60 text-[11px] font-sf-pro">
+              {planet.tagline}
+            </div>
+          </div>
+
+          {/* halo on hover */}
+          <div
+            className={`pointer-events-none absolute inset-0 rounded-full transition-all duration-300 ${
+              hover ? "ring-4 ring-white/20 scale-110" : "ring-0 scale-100"
+            }`}
+          />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function ThemeModal({
+  planet,
+  onClose,
+}: {
+  planet: Planet | null;
+  onClose: () => void;
+}) {
+  if (!planet) return null;
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-40 flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 10 }}
+          transition={{ type: "spring", stiffness: 260, damping: 22 }}
+          className="relative z-10 w-[360px] sm:w-[420px] rounded-[44px] border border-white/15 bg-gradient-to-b from-white/10 to-white/[0.03] p-4 shadow-2xl"
+        >
+          {/* header */}
+          <div className="flex items-center justify-between px-1 py-1">
+            <div className="text-left">
+              <div className="text-white font-semibold font-sf-pro">
+                {planet.name}
+              </div>
+              <div className="text-white/60 text-xs font-sf-pro">
+                {planet.tagline}
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-white/10 text-white"
+              aria-label="Close preview"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {/* iPhone mock screen */}
+          <div className="mt-2 rounded-[36px] overflow-hidden border border-white/10 bg-black">
+            {/* dynamic theme header */}
+            <div
+              className={`h-28 bg-gradient-to-br ${planet.gradient} flex items-center justify-center`}
+            >
+              <div className="text-white font-sf-pro font-semibold">Helthy</div>
+            </div>
+            <div className="p-4 space-y-3 bg-black">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="h-20 rounded-2xl bg-white/5 border border-white/10"></div>
+                <div className="h-20 rounded-2xl bg-white/5 border border-white/10"></div>
+                <div className="h-20 rounded-2xl bg-white/5 border border-white/10"></div>
+              </div>
+              <div className="h-10 rounded-xl bg-white/5 border border-white/10"></div>
+              <div className="h-10 rounded-xl bg-white/5 border border-white/10"></div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
