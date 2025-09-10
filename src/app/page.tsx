@@ -193,10 +193,10 @@ export default function Home() {
 
   return (
     <>
-      {/* iPhone Body - Silver bezel with white background */}
-      <div className="min-h-screen bg-gradient-to-br from-slate-300 via-slate-200 to-slate-300 px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
-        {/* iPhone Screen - Dark curved edges with dark background */}
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl">
+      {/* Black background with iPhone-shaped silver bevel */}
+      <div className="min-h-screen bg-black flex items-start justify-center px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
+        {/* iPhone Screen with silver border following the curved shape */}
+        <div className="w-full max-w-6xl bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400">
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
@@ -337,7 +337,7 @@ export default function Home() {
                   <div className="h-8"></div>
 
                   {/* Main Greeting */}
-                  <div className="mb-12">
+                  <div className="mb-12 mt-8">
                     <div className="text-sm text-gray-400 mb-2 font-sf-pro font-light tracking-wider uppercase">
                       Helthy Presents
                     </div>
@@ -362,7 +362,7 @@ export default function Home() {
 
                   {/* Main CTA */}
                   <motion.div
-                    className="space-y-8"
+                    className="space-y-8 mt-16"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}

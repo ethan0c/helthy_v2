@@ -65,7 +65,7 @@ body {
 
 /* Dynamic Island and Navigation matching colors */
 .dynamic-island {
-  background: #1a1a1a;
+  background: #000000;
   transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
