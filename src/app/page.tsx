@@ -541,7 +541,7 @@ export default function Home() {
                     width: showFeatureAI ? "100%" : 384,
                     height: showFeatureAI ? "auto" : 84,
                     borderRadius: showFeatureAI ? 46 : 42,
-                    y: showFeatureAI ? 10 : 0,
+                    y: showFeatureAI ? 40 : 0,
                   }}
                   transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="mt-16 mx-auto bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl border border-gray-300/70 shadow-2xl overflow-hidden relative"
