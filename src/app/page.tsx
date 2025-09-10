@@ -61,6 +61,7 @@ export default function Home() {
   const [isDynamicIslandVisible, setIsDynamicIslandVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [aiExpanded, setAiExpanded] = useState(false);
   const [aiManualCollapsed, setAiManualCollapsed] = useState(false);
   const aiTriggerRef = useRef<HTMLDivElement | null>(null);
@@ -76,6 +77,12 @@ export default function Home() {
       const currentScrollY = window.scrollY;
       const scrollingUp = currentScrollY < lastScrollY;
       const hasScrolledDown = currentScrollY > 100;
+
+      // Calculate scroll progress for iPhone expansion (0 to 1)
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min(currentScrollY / (maxScroll * 0.3), 1); // Expand over first 30% of page
+      setScrollProgress(progress);
 
       setLastScrollY(currentScrollY);
 
@@ -369,14 +376,14 @@ export default function Home() {
                   >
                     <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                       <motion.button
-                        className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-5 rounded-full text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
+                        className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-5 rounded-full text-lg font-normal shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         Start Your Journey
                       </motion.button>
                       <motion.button
-                        className="border-2 border-gray-400 text-gray-300 px-12 py-5 rounded-full text-lg font-semibold hover:border-gray-300 hover:bg-gray-800/50 transition-all duration-300 font-sf-pro"
+                        className="border-2 border-gray-400 text-gray-300 px-12 py-5 rounded-full text-lg font-normal hover:border-gray-300 hover:bg-gray-800/50 transition-all duration-300 font-sf-pro"
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.95 }}
                       >
