@@ -536,34 +536,70 @@ export default function Home() {
                 <motion.div
                   key="ai-section"
                   layoutId="ai-insights"
-                  initial={{ opacity: 0, y: 90, height: 0 }}
+                  initial={{ opacity: 1 }}
                   animate={{
-                    opacity: showFeatureAI ? 1 : 0,
-                    y: showFeatureAI ? 0 : 90,
-                    height: showFeatureAI ? "auto" : 0,
+                    width: showFeatureAI ? "100%" : 384,
+                    height: showFeatureAI ? "auto" : 84,
+                    borderRadius: showFeatureAI ? 46 : 42,
+                    y: showFeatureAI ? 10 : 0,
                   }}
-                  transition={{ duration: 0.75, ease: [0.4, 0, 0.2, 1] }}
-                  className="mt-16 bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl rounded-[46px] border border-gray-300/70 shadow-2xl px-6 sm:px-8 py-8 overflow-hidden"
+                  transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="mt-16 mx-auto bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl border border-gray-300/70 shadow-2xl overflow-hidden relative"
+                  style={{
+                    paddingLeft: showFeatureAI ? 24 : 0,
+                    paddingRight: showFeatureAI ? 24 : 0,
+                    paddingTop: showFeatureAI ? 32 : 0,
+                    paddingBottom: showFeatureAI ? 32 : 0,
+                  }}
                 >
-                  <div className="flex items-start justify-between mb-6">
-                    <div>
-                      <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
-                        AI Coach
+                  {/* Collapsed state - Dynamic Island style */}
+                  {!showFeatureAI && (
+                    <motion.div
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: showFeatureAI ? 0 : 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center justify-center h-full w-full"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-gray-600/60 rounded-full"></div>
+                        <div className="w-20 h-1.5 bg-gray-600/40 rounded-full"></div>
+                        <div className="text-xs text-gray-600 font-sf-pro">
+                          AI Coach
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600 font-sf-pro">
-                        Unified guidance across training & nutrition
+                    </motion.div>
+                  )}
+
+                  {/* Expanded state - Full AI section */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: showFeatureAI ? 1 : 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: showFeatureAI ? 0.4 : 0,
+                    }}
+                    className={showFeatureAI ? "block" : "hidden"}
+                  >
+                    <div className="flex items-start justify-between mb-6">
+                      <div>
+                        <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
+                          AI Coach
+                        </div>
+                        <div className="text-sm text-gray-600 font-sf-pro">
+                          Unified guidance across training & nutrition
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="flex flex-col gap-6">
-                      <VoiceLoggingCard className="h-60" />
-                      <AIDescribeCard className="h-60" />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div className="flex flex-col gap-6">
+                        <VoiceLoggingCard className="h-60" />
+                        <AIDescribeCard className="h-60" />
+                      </div>
+                      <div className="lg:col-span-2">
+                        <AIChatPanel className="min-h-[520px]" />
+                      </div>
                     </div>
-                    <div className="lg:col-span-2">
-                      <AIChatPanel className="min-h-[520px]" />
-                    </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               </div>
             </section>
@@ -1192,7 +1228,7 @@ function OrbitingThemes({ planets }: { planets: readonly Planet[] }) {
 
       {/* orbit rings */}
       <div
-        className="absolute left-1/2 top-1/2"
+        className="absolute left-1/2 top-1/2 pointer-events-none z-10"
         style={{ transform: "translate(-50%, -50%) rotateX(55deg)" }}
       >
         {rings.map((r, idx) => (
@@ -1210,25 +1246,27 @@ function OrbitingThemes({ planets }: { planets: readonly Planet[] }) {
       </div>
 
       {/* planets - ensure proper z-index and clickability */}
-      {assignments.map(({ planet, ring, start, diameter }, i) => (
-        <PlanetOnOrbit
-          key={planet.key}
-          planet={planet}
-          radius={ring.radius}
-          speed={ring.speed}
-          startDeg={start}
-          diameter={diameter}
-          paused={paused || Boolean(active)}
-          onActivate={() => {
-            console.log(`Clicked planet: ${planet.name}`); // Debug log
-            setActive(planet);
-            setPaused(true);
-          }}
-        />
-      ))}
+      <div className="relative z-20">
+        {assignments.map(({ planet, ring, start, diameter }, i) => (
+          <PlanetOnOrbit
+            key={planet.key}
+            planet={planet}
+            radius={ring.radius}
+            speed={ring.speed}
+            startDeg={start}
+            diameter={diameter}
+            paused={paused || Boolean(active)}
+            onActivate={() => {
+              console.log(`Clicked planet: ${planet.name}`); // Debug log
+              setActive(planet);
+              setPaused(true);
+            }}
+          />
+        ))}
+      </div>
 
       {/* legend */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-sm font-sf-pro text-center">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-sm font-sf-pro text-center pointer-events-none z-10">
         <p>Click any planet to preview that theme</p>
         <p className="text-xs text-white/40 mt-1">
           Hover to pause orbital motion
@@ -1262,23 +1300,27 @@ function PlanetOnOrbit({
 
   return (
     <motion.div
-      className="absolute [transform-style:preserve-3d]"
+      className="absolute [transform-style:preserve-3d] z-30"
       style={{ width: radius * 2, height: radius * 2 }}
       animate={paused ? { rotate: startDeg } : { rotate: 360 + startDeg }}
       initial={{ rotate: startDeg }}
       transition={{ repeat: Infinity, ease: "linear", duration }}
     >
       <div
-        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)]"
+        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)] z-40"
         style={{ transform: `translate(${radius}px, -50%)` }}
       >
         <button
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          onClick={onActivate}
-          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full z-10"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onActivate();
+          }}
+          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full z-50 cursor-pointer"
           aria-label={`${planet.name} theme`}
-          style={{ pointerEvents: "auto" }}
+          style={{ pointerEvents: "auto", isolation: "isolate" }}
         >
           {/* planet body with 3D lighting */}
           <div
