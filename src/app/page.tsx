@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import {
-  motion,
-  useScroll,
-  AnimatePresence,
-  LayoutGroup,
-  useInView,
-} from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import {
   Activity,
   Brain,
@@ -61,28 +55,23 @@ export default function Home() {
   const [isDynamicIslandVisible, setIsDynamicIslandVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [aiExpanded, setAiExpanded] = useState(false);
-  const [aiManualCollapsed, setAiManualCollapsed] = useState(false);
-  const aiTriggerRef = useRef<HTMLDivElement | null>(null);
-  // in-view detection near the AI section to auto-expand insights
-  const aiTriggerInView = useInView(aiTriggerRef, {
-    amount: 0.4,
-    margin: "0px 0px -10% 0px",
-  });
-  const { scrollYProgress } = useScroll();
+  // bezel expansion + auto AI section
+  const [showFeatureAI, setShowFeatureAI] = useState(false);
+  const [shouldExpandPhone, setShouldExpandPhone] = useState(false);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const ctaContainerRef = useRef<HTMLDivElement | null>(null);
+  const aiAutoRef = useRef<HTMLDivElement | null>(null);
+  const aiInView = useInView(aiAutoRef, { amount: 0.3, once: true });
+  // trigger AI section when sentinel enters view
+  useEffect(() => {
+    if (aiInView) setShowFeatureAI(true);
+  }, [aiInView]);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const scrollingUp = currentScrollY < lastScrollY;
       const hasScrolledDown = currentScrollY > 100;
-
-      // Calculate scroll progress for iPhone expansion (0 to 1)
-      const maxScroll =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const progress = Math.min(currentScrollY / (maxScroll * 0.3), 1); // Expand over first 30% of page
-      setScrollProgress(progress);
 
       setLastScrollY(currentScrollY);
 
@@ -101,13 +90,19 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Auto-expand AI when the trigger is in view; stay expanded until user manually closes
+  // Bezel expansion after CTA buttons fully leave viewport
   useEffect(() => {
-    if (aiTriggerInView && !aiManualCollapsed) {
-      setAiExpanded(true);
-    }
-    // Removed auto-collapse when out of view - let it stay expanded until user closes
-  }, [aiTriggerInView, aiManualCollapsed]);
+    const onScroll = () => {
+      const el = ctaContainerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const fullyAbove = rect.bottom <= 0; // entire CTA area has scrolled above
+      setShouldExpandPhone(fullyAbove);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Keep manual collapse state persistent - don't reset it automatically
   // This ensures once user closes AI, it stays closed until they manually open it again
@@ -203,7 +198,16 @@ export default function Home() {
       {/* Black background with iPhone-shaped silver bevel */}
       <div className="min-h-screen bg-black flex items-start justify-center px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
         {/* iPhone Screen with silver border following the curved shape */}
-        <div className="w-full max-w-6xl bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400">
+        <motion.div
+          className="w-full max-w-6xl bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
+          style={{ willChange: "max-width" }}
+          initial={false}
+          animate={{
+            maxWidth: shouldExpandPhone ? "100%" : "72rem",
+            width: "100%",
+          }}
+          transition={{ duration: 1.15, ease: [0.4, 0.0, 0.2, 1] }}
+        >
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
@@ -237,7 +241,7 @@ export default function Home() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
+                      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                       className="flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black rounded-full"
                     >
                       <Image
@@ -297,6 +301,7 @@ export default function Home() {
             {/* Hero Section - Full iPhone Screen */}
             <section
               id="home"
+              ref={heroRef}
               className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
             >
               {/* Video Background */}
@@ -344,31 +349,60 @@ export default function Home() {
                   <div className="h-8"></div>
 
                   {/* Main Greeting */}
-                  <div className="mb-12 mt-8">
-                    <div className="text-sm text-gray-400 mb-2 font-sf-pro font-light tracking-wider uppercase">
-                      Helthy Presents
+                  <div className="mb-14 mt-10">
+                    <div className="text-[11px] tracking-[0.35em] text-white/50 mb-8 font-sf-pro uppercase flex items-center justify-center gap-5">
+                      <span className="h-px w-12 bg-white/15" /> HELTHY PRESENTS{" "}
+                      <span className="h-px w-12 bg-white/15" />
                     </div>
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-2 font-inter leading-[0.9] tracking-tight">
-                      FITNESS{" "}
-                      <span className="bg-gradient-to-r from-gray-100 via-white to-gray-200 bg-clip-text text-transparent">
-                        REVOLUTION
-                      </span>
+                    <h1 className="text-[2.9rem] md:text-[4.6rem] lg:text-[5.4rem] font-extrabold text-white mb-8 font-inter leading-[0.9] tracking-[-0.02em]">
+                      THE FUTURE OF FITNESS
                     </h1>
-                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 font-inter leading-tight">
-                      Enter the Data Zone
+                    <h2 className="text-xl md:text-[2.3rem] lg:text-[2.8rem] font-medium text-white/90 mb-14 font-inter leading-snug max-w-5xl mx-auto">
+                      <span className="bg-gradient-to-r from-white via-gray-200 to-white/70 bg-clip-text text-transparent">
+                        Data in motion
+                      </span>
+                      .{" "}
+                      <span className="text-white/75">
+                        Precision in progress.
+                      </span>
                     </h2>
-                    <p className="text-lg md:text-xl text-gray-300 font-sf-pro font-light max-w-3xl mx-auto leading-relaxed">
-                      Join the movement to see the reveal of next-generation
-                      fitness tracking.
-                      <br />
-                      Transform your body with precision, not guesswork.
-                    </p>
+                    <div className="max-w-5xl mx-auto flex flex-col items-center gap-10">
+                      <div className="flex flex-col md:flex-row md:items-center gap-7 w-full justify-center">
+                        <p className="text-[12px] md:text-xs lg:text-sm font-sf-pro tracking-[0.25em] text-white/55 uppercase flex items-center gap-2">
+                          <span className="inline-block h-1 w-1 rounded-full bg-white/40" />{" "}
+                          ZERO NOISE • PURE SIGNAL
+                        </p>
+                        <p className="text-[12px] md:text-xs lg:text-sm font-sf-pro tracking-[0.25em] text-white/55 uppercase flex items-center gap-2">
+                          <span className="inline-block h-1 w-1 rounded-full bg-white/40" />{" "}
+                          REPS • MEALS • RECOVERY
+                        </p>
+                      </div>
+                      <p className="text-xl md:text-2xl lg:text-[2.2rem] font-inter font-semibold tracking-tight text-white/90 text-center leading-snug">
+                        Your body —{" "}
+                        <span className="text-white/65 font-normal">
+                          measured
+                        </span>
+                        ,{" "}
+                        <span className="text-white/65 font-normal">
+                          interpreted
+                        </span>
+                        ,{" "}
+                        <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                          mastered
+                        </span>
+                        .
+                      </p>
+                      <p className="text-[11px] md:text-xs tracking-[0.35em] text-white/40 font-sf-pro uppercase">
+                        NO HYPE. JUST PROOF.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Quick Stats Dashboard removed per request */}
 
                   {/* Main CTA */}
                   <motion.div
+                    ref={ctaContainerRef}
                     className="space-y-8 mt-16"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -391,6 +425,7 @@ export default function Home() {
                       </motion.button>
                     </div>
                   </motion.div>
+                  {/* Expansion now controlled by scroll position of CTA container */}
                 </motion.div>
               </div>
 
@@ -404,241 +439,136 @@ export default function Home() {
               </motion.div>
             </section>
 
-            {/* Features Section - Inside iPhone */}
+            {/* Invisible anchor for AI nav link */}
+            <div id="ai" aria-hidden className="h-0" />
+            {/* Features Section - Redesigned with embedded AI overlay */}
             <section
               id="features"
-              className="py-32 px-8 relative overflow-hidden bg-gradient-to-b from-gray-900/95 via-gray-800 to-gray-900"
+              className="relative overflow-hidden bg-[#0B0B0B] pt-44 pb-44 px-6 sm:px-10"
             >
-              {/* Seamless transition gradient from hero video */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 via-black/60 to-transparent"></div>
-                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-gray-900/0"></div>
+              {/* Subtle top/bottom vignettes like reference */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-black via-black/60 to-transparent" />
+                <div className="absolute bottom-0 inset-x-0 h-56 bg-gradient-to-t from-black via-black/70 to-transparent" />
               </div>
 
-              <div className="max-w-7xl mx-auto relative z-10">
-                <SectionMeta label="Features" number="02" tone="dark" />
-
-                {/* Features description */}
-                <div className="mb-16 text-left">
-                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-inter">
-                    Everything you need to succeed
+              <div className="relative z-10 max-w-[1500px] mx-auto">
+                <SectionMeta
+                  label="Features"
+                  number="02"
+                  tone="dark"
+                  className="mx-auto max-w-none"
+                />
+                <div className="text-center max-w-4xl mx-auto mb-24">
+                  <h2 className="text-[3.25rem] sm:text-[4.5rem] lg:text-[5.2rem] leading-[1.05] font-medium text-white font-sf-pro tracking-tight">
+                    <span className="italic font-light">Track</span>{" "}
+                    <span className="font-semibold">everything</span>
                   </h2>
-                  <p className="text-lg text-gray-300 font-sf-pro max-w-xl">
-                    Create custom workouts, track your progress, plan meals, and
-                    get AI-powered insights—all in one intelligent platform
-                    designed for real results.
+                  <p className="mt-8 text-lg sm:text-xl text-white/80 font-sf-pro max-w-2xl mx-auto leading-relaxed">
+                    See every rep, meal, and recovery signal—unified and clear.
                   </p>
-                </div>
-
-                {/* Features: three large cards in a single row (1x3) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <div className="relative overflow-hidden h-[600px] rounded-3xl group cursor-pointer">
-                      <Image
-                        src="/features/Group 1 (1).png"
-                        alt="Exercise and Workout Tracking"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      <div className="absolute bottom-8 left-8 right-8 text-white">
-                        <div className="text-xs uppercase tracking-wide text-white/70 font-sf-pro mb-2">
-                          Workouts
-                        </div>
-                        <h3 className="text-3xl font-bold font-inter mb-3 leading-tight">
-                          Exercise
-                        </h3>
-                        <p className="text-white/90 font-sf-pro mb-4 leading-relaxed">
-                          Create and track workouts with precision. Log sets,
-                          reps, and weights with smart progression suggestions.
-                        </p>
-                        <div className="text-sm text-white/70 font-sf-pro">
-                          4 sets • 8 reps • 155 lb
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.1 }}
-                  >
-                    <div className="relative overflow-hidden h-[600px] rounded-3xl group cursor-pointer">
-                      <Image
-                        src="/features/Group 2.png"
-                        alt="Meal Planning and Nutrition"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      <div className="absolute bottom-8 left-8 right-8 text-white">
-                        <div className="text-xs uppercase tracking-wide text-white/70 font-sf-pro mb-2">
-                          Nutrition
-                        </div>
-                        <h3 className="text-3xl font-bold font-inter mb-3 leading-tight">
-                          Meal Planning
-                        </h3>
-                        <p className="text-white/90 font-sf-pro mb-4 leading-relaxed">
-                          Plan meals, track macros, and hit your goals with
-                          smart recommendations tailored to your lifestyle.
-                        </p>
-                        <div className="text-sm text-white/70 font-sf-pro">
-                          1,420 / 2,100 calories
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    <div className="relative overflow-hidden h-[600px] rounded-3xl group cursor-pointer">
-                      <Image
-                        src="/features/Group 3.png"
-                        alt="AI Insights and Coaching"
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      <div className="absolute bottom-8 left-8 right-8 text-white">
-                        <div className="text-xs uppercase tracking-wide text-white/70 font-sf-pro mb-2">
-                          Intelligence
-                        </div>
-                        <h3 className="text-3xl font-bold font-inter mb-3 leading-tight">
-                          AI & Insights
-                        </h3>
-                        <p className="text-white/90 font-sf-pro mb-4 leading-relaxed">
-                          Personalized coaching and context-aware tips that
-                          evolve with your progress and preferences.
-                        </p>
-                        <div className="text-sm text-white/70 font-sf-pro">
-                          Smart tips • Recovery • Macros
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Short description below the feature cards */}
-                <div className="mt-8">
-                  <p className="text-base text-gray-300 font-sf-pro max-w-2xl">
-                    Explore core Helthy features at a glance. Tap any card to
-                    open deeper tools—workouts, meal planning, and AI insights
-                    are all designed to occupy the screen so you can focus on
-                    what matters.
-                  </p>
-
-                  {/* Clickable AI card below the write-up; uses layoutId to expand into AI section */}
-                  <div className="mt-8">
-                    {!aiExpanded && (
-                      <motion.div
-                        className="cursor-pointer"
-                        initial={{ opacity: 0, y: 18 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        onClick={() => {
-                          setAiExpanded(true);
-                          setTimeout(() => {
-                            document.getElementById("ai")?.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            });
-                          }, 50);
-                        }}
-                      >
-                        <motion.div layoutId="ai-insights">
-                          <AIInsightsCard
-                            className="p-2"
-                            image="/features/Group 3.png"
-                            imageAlt="Feature 3"
-                          />
-                        </motion.div>
-                      </motion.div>
-                    )}
+                  <div className="mt-10">
+                    <button className="px-7 py-4 rounded-2xl bg-[#1A1A1A] text-white/90 hover:text-white border border-white/10 font-mono text-xs tracking-wider uppercase shadow-inner shadow-white/5 hover:bg-[#222] transition-colors">
+                      More About Tracking
+                    </button>
                   </div>
                 </div>
-              </div>
-            </section>
 
-            {/* AI Section - Inside iPhone */}
-            <section
-              id="ai"
-              className="py-32 px-8 bg-gradient-to-br from-gray-800 to-gray-900"
-            >
-              <div className="max-w-7xl mx-auto">
-                {/* Sentinel for auto-expansion trigger */}
-                <div
-                  ref={aiTriggerRef as any}
-                  aria-hidden
-                  className="h-1 w-1"
-                />
-                <SectionMeta label="AI" number="03" tone="dark" />
-                <AnimatePresence initial={false}>
-                  {aiExpanded && (
+                {/* Three large feature cards */}
+                <div className="grid md:grid-cols-3 gap-3 xl:gap-4 relative">
+                  {[
+                    {
+                      title: "Monitor your training",
+                      copy: "Every set, rep, tempo, and progression queued automatically.",
+                      img: "/features/Group 1 (1).png",
+                    },
+                    {
+                      title: "Build a plan",
+                      copy: "AI structures cycles, balances fatigue, and keeps you progressing.",
+                      img: "/features/Group 2.png",
+                    },
+                    {
+                      title: "Intelligent insights",
+                      copy: "Patterns surfaced: recovery dips, macro gaps, strength trends.",
+                      img: "/features/Group 3.png",
+                    },
+                  ].map((card, i) => (
                     <motion.div
-                      layoutId="ai-insights"
-                      className="bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-lg rounded-3xl border border-gray-300 shadow-2xl p-4 sm:p-6"
-                      initial={{ opacity: 0.92, y: 6 }}
-                      animate={{ opacity: 1, y: 10 }}
-                      exit={{ opacity: 0, y: 0 }}
+                      key={card.title}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.4 }}
                       transition={{
-                        type: "spring",
-                        stiffness: 220,
-                        damping: 26,
-                        mass: 0.9,
+                        duration: 0.75,
+                        ease: [0.4, 0, 0.2, 1],
+                        delay: i * 0.08,
                       }}
+                      className="group relative h-[740px] lg:h-[780px] rounded-[50px] overflow-hidden bg-transparent shadow-[0_10px_42px_-12px_rgba(0,0,0,0.65)]"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
-                            AI Coach
-                          </div>
-                          <div className="text-sm text-gray-600 font-sf-pro">
-                            Your personal assistant for fitness and nutrition
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setAiExpanded(false);
-                            setAiManualCollapsed(true);
-                          }}
-                          className="p-2 rounded-full hover:bg-gray-200/60 text-gray-700"
-                          aria-label="Collapse AI features"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
+                      <div className="absolute inset-0">
+                        <Image
+                          src={card.img}
+                          alt={card.title}
+                          fill
+                          priority={i === 0}
+                          className="object-cover object-center transition-transform duration-[2400ms] ease-[cubic-bezier(.4,0,.2,1)] group-hover:scale-[1.065]"
+                        />
+                        {/* bottom blend into page background */}
+                        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/80 via-30% to-transparent" />
+                        {/* feather edge at very bottom to remove hard line */}
+                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0B0B0B] to-transparent opacity-90" />
                       </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        {/* Left column: two stacked cards */}
-                        <div className="flex flex-col gap-4">
-                          <VoiceLoggingCard className="h-60" />
-                          <AIDescribeCard className="h-60" />
-                        </div>
-
-                        {/* Right column: chat panel spans two columns on large screens */}
-                        <div className="lg:col-span-2">
-                          <AIChatPanel className="min-h-[496px]" />
-                        </div>
+                      {/* Content bottom */}
+                      <div className="absolute inset-x-0 bottom-0 p-10 pt-32 flex flex-col">
+                        <h3 className="text-2xl sm:text-3xl font-semibold text-white font-inter mb-3 tracking-tight">
+                          {card.title}
+                        </h3>
+                        <p className="text-white/65 text-sm sm:text-base font-sf-pro leading-relaxed max-w-[92%]">
+                          {card.copy}
+                        </p>
+                        {/* AI section appears automatically below when scrolled */}
                       </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
+                  ))}
+                </div>
+                {/* AI auto-expanding section */}
+                <div ref={aiAutoRef} className="mt-40" />
+                <motion.div
+                  key="ai-section"
+                  layoutId="ai-insights"
+                  initial={{ opacity: 0, y: 90, height: 0 }}
+                  animate={{
+                    opacity: showFeatureAI ? 1 : 0,
+                    y: showFeatureAI ? 0 : 90,
+                    height: showFeatureAI ? "auto" : 0,
+                  }}
+                  transition={{ duration: 0.75, ease: [0.4, 0, 0.2, 1] }}
+                  className="mt-16 bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl rounded-[46px] border border-gray-300/70 shadow-2xl px-6 sm:px-8 py-8 overflow-hidden"
+                >
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
+                        AI Coach
+                      </div>
+                      <div className="text-sm text-gray-600 font-sf-pro">
+                        Unified guidance across training & nutrition
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="flex flex-col gap-6">
+                      <VoiceLoggingCard className="h-60" />
+                      <AIDescribeCard className="h-60" />
+                    </div>
+                    <div className="lg:col-span-2">
+                      <AIChatPanel className="min-h-[520px]" />
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </section>
           </LayoutGroup>
-        </div>
+        </motion.div>
       </div>
 
       {/* Outside iPhone Screen - Black Background Sections */}
