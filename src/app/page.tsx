@@ -54,6 +54,40 @@ export default function Home() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [isDynamicIslandVisible, setIsDynamicIslandVisible] = useState(true);
   const [email, setEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [waitlistError, setWaitlistError] = useState<string | null>(null);
+
+  async function submitWaitlist(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+    if (!email) return;
+    setWaitlistStatus("loading");
+    setWaitlistError(null);
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Failed");
+      setWaitlistStatus("success");
+      setEmail("");
+    } catch (err: any) {
+      setWaitlistStatus("error");
+      setWaitlistError(err.message || "Something went wrong");
+    } finally {
+      setTimeout(() => {
+        setWaitlistStatus("idle");
+        setWaitlistError(null);
+      }, 4000);
+    }
+  }
+  // Billing period with added lifetime (option C)
+  const [billingPeriod, setBillingPeriod] = useState<
+    "monthly" | "annual" | "lifetime"
+  >("monthly");
   const [lastScrollY, setLastScrollY] = useState(0);
   // bezel expansion + auto AI section
   const [showFeatureAI, setShowFeatureAI] = useState(false);
@@ -531,8 +565,7 @@ export default function Home() {
                     </motion.div>
                   ))}
                 </div>
-                {/* AI auto-expanding section */}
-                <div ref={aiAutoRef} className="mt-40" />
+                {/* AI auto-expanding section - positioned right after cards */}
                 <motion.div
                   key="ai-section"
                   layoutId="ai-insights"
@@ -544,7 +577,7 @@ export default function Home() {
                     y: showFeatureAI ? 40 : 0,
                   }}
                   transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="mt-16 mx-auto bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl border border-gray-300/70 shadow-2xl overflow-hidden relative"
+                  className="mt-20 mx-auto bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl border border-gray-300/70 shadow-2xl overflow-hidden relative"
                   style={{
                     paddingLeft: showFeatureAI ? 24 : 0,
                     paddingRight: showFeatureAI ? 24 : 0,
@@ -601,6 +634,8 @@ export default function Home() {
                     </div>
                   </motion.div>
                 </motion.div>
+                {/* Invisible trigger for AI expansion */}
+                <div ref={aiAutoRef} className="mt-16" />
               </div>
             </section>
           </LayoutGroup>
@@ -639,15 +674,261 @@ export default function Home() {
           <OrbitingThemes planets={themePlanets} />
         </section>
 
+        {/* Pricing Section */}
+        <section
+          id="pricing"
+          className="relative overflow-hidden bg-black px-8 pt-8 pb-20"
+        >
+          <div className="max-w-6xl mx-auto">
+            <SectionMeta label="Pricing" number="05" tone="dark" />
+            <div className="grid lg:grid-cols-12 gap-14 items-start">
+              {/* Copy / Value Prop */}
+              <div className="lg:col-span-5 space-y-8">
+                <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white font-sf-pro leading-tight">
+                  Tired of paying for{" "}
+                  <span className="bg-gradient-to-r from-white via-white/80 to-white/40 bg-clip-text text-transparent">
+                    4 different fitness apps?
+                  </span>
+                  <br />
+                  <span className="font-light italic">We got you.</span>
+                </h2>
+                <p className="text-white/60 font-sf-pro text-base leading-relaxed max-w-md">
+                  Training plans, macro tracking, recovery insights, AI coaching
+                  & voice logging—unified in one intelligent stack.
+                </p>
+                <ul className="space-y-4 text-sm font-sf-pro text-white/70">
+                  {[
+                    "Adaptive periodized programming",
+                    "Real-time macro + recovery analysis",
+                    "AI coach chat & plan generation",
+                    "Hands‑free voice logging",
+                    "Themes & personalization",
+                    "Private data, encrypted sync",
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-3">
+                      <span className="mt-1 inline-block w-2 h-2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 shadow-[0_0_0_3px_rgba(255,255,255,0.05)]" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Pricing Card */}
+              <div className="lg:col-span-7">
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                  className="relative rounded-[46px] border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.03] to-transparent p-10 md:p-12 overflow-hidden"
+                >
+                  {/* subtle backdrop accents */}
+                  <div className="pointer-events-none absolute -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/10 blur-3xl" />
+                  <div className="pointer-events-none absolute bottom-0 left-0 w-80 h-80 rounded-full bg-gradient-to-tr from-sky-400/10 to-violet-400/5 blur-3xl" />
+
+                  <div className="flex items-center justify-between mb-10 relative z-10">
+                    <div>
+                      <div className="text-xs font-sf-pro tracking-wider text-white/50 uppercase mb-2">
+                        Launch Pricing
+                      </div>
+                      <h3 className="text-2xl font-semibold text-white font-sf-pro tracking-tight">
+                        One plan. Everything.
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full p-1">
+                      {(["monthly", "annual", "lifetime"] as const).map(
+                        (mode) => (
+                          <button
+                            key={mode}
+                            onClick={() => setBillingPeriod(mode)}
+                            className={`px-4 py-2.5 rounded-full text-[11px] font-medium tracking-wide font-sf-pro transition-all duration-300 ${
+                              billingPeriod === mode
+                                ? "bg-white text-black shadow"
+                                : "text-white/60 hover:text-white"
+                            }`}
+                          >
+                            {mode === "monthly"
+                              ? "Monthly"
+                              : mode === "annual"
+                              ? "Annual"
+                              : "Lifetime"}
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Price Logic */}
+                  {(() => {
+                    const monthlyBase = 15.99;
+                    const annualBase = monthlyBase * 12; // 191.88
+                    const discountRate = 0.4; // 40%
+                    const annualDiscounted = annualBase * (1 - discountRate); // 115.128
+                    const annualDisplay = 114.99; // prettier number
+                    const monthlyDiscounted = (
+                      monthlyBase *
+                      (1 - discountRate)
+                    ).toFixed(2); // if we want to show discount monthly view
+                    // Lifetime (option C)
+                    const lifetimeBase = 399; // anchor value
+                    const lifetimeLaunch = 249; // launch lifetime price
+                    const showAnnual = billingPeriod === "annual";
+                    const showLifetime = billingPeriod === "lifetime";
+                    return (
+                      <div className="relative z-10">
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+                          <div>
+                            <div className="flex items-center gap-4 mb-4">
+                              {!showLifetime && (
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-black text-[11px] font-semibold tracking-wide font-sf-pro shadow-lg">
+                                  40% OFF{" "}
+                                  <span className="hidden sm:inline">
+                                    LAUNCH
+                                  </span>
+                                </span>
+                              )}
+                              {showLifetime && (
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-teal-400 to-emerald-500 text-black text-[11px] font-semibold tracking-wide font-sf-pro shadow-lg">
+                                  BEST VALUE
+                                </span>
+                              )}
+                              <span className="text-[11px] font-sf-pro tracking-wider text-white/50 uppercase">
+                                {showLifetime
+                                  ? "One-Time Purchase"
+                                  : "Limited Time"}
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-4">
+                              {showLifetime ? (
+                                <>
+                                  <div className="text-6xl font-extrabold tracking-tight text-white font-inter leading-none">
+                                    ${lifetimeLaunch}
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <div className="text-white/40 text-sm font-sf-pro line-through">
+                                      ${lifetimeBase.toFixed(2)}
+                                    </div>
+                                    <div className="text-white/50 text-xs font-sf-pro">
+                                      Pay once • All future updates
+                                    </div>
+                                  </div>
+                                </>
+                              ) : showAnnual ? (
+                                <>
+                                  <div className="text-6xl font-extrabold tracking-tight text-white font-inter leading-none">
+                                    ${annualDisplay}
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <div className="text-white/40 text-sm font-sf-pro line-through">
+                                      ${annualBase.toFixed(2)}
+                                    </div>
+                                    <div className="text-white/50 text-xs font-sf-pro">
+                                      Billed yearly
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-6xl font-extrabold tracking-tight text-white font-inter leading-none">
+                                    ${monthlyBase.toFixed(2)}
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <div className="text-white/40 text-sm font-sf-pro line-through">
+                                      ${parseFloat(monthlyDiscounted)}
+                                    </div>
+                                    <div className="text-white/50 text-xs font-sf-pro">
+                                      Per month
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                            <p className="mt-6 text-sm text-white/60 font-sf-pro max-w-sm leading-relaxed">
+                              {showLifetime
+                                ? "Own Helthy forever. All current & future features + AI upgrades. No renewals, no surprises."
+                                : showAnnual
+                                ? "Secure the launch discount for 12 months. All features. Priority AI upgrades included."
+                                : "Full access. Cancel anytime. Upgrade later and keep everything."}
+                            </p>
+                          </div>
+                          <div className="flex flex-col gap-4 w-full max-w-xs">
+                            <button className="w-full rounded-2xl py-5 bg-gradient-to-r from-white to-gray-200 text-black font-sf-pro font-medium text-sm tracking-wide shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
+                              {showLifetime
+                                ? "Get Lifetime Access"
+                                : showAnnual
+                                ? "Get Annual Access"
+                                : "Start Monthly"}
+                            </button>
+                            <div className="grid grid-cols-2 gap-3">
+                              <button
+                                onClick={() =>
+                                  setBillingPeriod(
+                                    showLifetime ? "monthly" : "lifetime"
+                                  )
+                                }
+                                className="w-full rounded-2xl py-3 bg-white/5 border border-white/10 text-white/80 hover:text-white hover:bg-white/10 font-sf-pro text-[11px] tracking-wider transition-colors"
+                              >
+                                {showLifetime ? "Monthly" : "Lifetime"}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setBillingPeriod(
+                                    showAnnual ? "monthly" : "annual"
+                                  )
+                                }
+                                className="w-full rounded-2xl py-3 bg-white/5 border border-white/10 text-white/80 hover:text-white hover:bg-white/10 font-sf-pro text-[11px] tracking-wider transition-colors"
+                              >
+                                {showAnnual ? "Monthly" : "Annual"}
+                              </button>
+                            </div>
+                            <div className="text-[10px] text-white/40 font-sf-pro tracking-wide text-center">
+                              {showLifetime
+                                ? "Pay once • Lifetime updates • Encrypted"
+                                : "Encrypted • Cancel anytime • No hidden fees"}
+                            </div>
+                          </div>
+                        </div>
+                        {/* Comparison strip */}
+                        <div className="mt-12 grid sm:grid-cols-4 gap-4 text-center">
+                          {[
+                            { label: "Programs", other: "3 apps" },
+                            { label: "Nutrition", other: "1 app" },
+                            { label: "Recovery", other: "1 app" },
+                            { label: "AI Coach", other: "—" },
+                          ].map((cell) => (
+                            <div
+                              key={cell.label}
+                              className="rounded-2xl bg-white/[0.04] border border-white/10 px-4 py-5 flex flex-col gap-2"
+                            >
+                              <div className="text-[11px] tracking-wider text-white/50 font-sf-pro uppercase">
+                                {cell.label}
+                              </div>
+                              <div className="text-xs font-sf-pro text-white/40 line-through">
+                                {cell.other}
+                              </div>
+                              <div className="text-sm font-semibold text-white font-sf-pro">
+                                Helthy
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Transition band: Themes → FAQ */}
-        <div aria-hidden className="relative h-16 sm:h-20">
+        <div aria-hidden className="relative h-8 sm:h-10">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent opacity-[0.18]"></div>
         </div>
 
         {/* FAQ Section - Dark mode layout inspired by the reference */}
-        <section id="faq" className="py-32 px-8 bg-black">
+        <section id="faq" className="py-28 px-8 bg-black">
           <div className="max-w-7xl mx-auto">
-            <SectionMeta label="FAQ" number="05" tone="dark" />
+            <SectionMeta label="FAQ" number="06" tone="dark" />
 
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -693,14 +974,14 @@ export default function Home() {
         </section>
 
         {/* Transition band: FAQ → Waitlist */}
-        <div aria-hidden className="relative h-24 sm:h-28">
+        <div aria-hidden className="relative h-12 sm:h-14">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black"></div>
         </div>
 
         {/* Waitlist Section - Matching reference design */}
         <section
           id="waitlist"
-          className="relative min-h-screen flex items-center justify-center px-8 overflow-hidden"
+          className="relative px-8 py-40 flex items-center justify-center overflow-hidden"
         >
           {/* Gradient Background with Earth Horizon - Softer blending */}
           <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black">
@@ -730,7 +1011,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <SectionMeta label="Waitlist" number="06" tone="dark" />
+              <SectionMeta label="Waitlist" number="07" tone="dark" />
               {/* Main heading - SF Pro with Playfair for "who wait" */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-4 leading-tight font-sf-pro tracking-tight">
                 <span className="font-medium">Good things come</span>
@@ -746,22 +1027,51 @@ export default function Home() {
               </p>
 
               {/* Email form */}
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <form
+                onSubmit={submitWaitlist}
+                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+              >
                 <input
                   type="email"
                   placeholder="Your Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-6 py-4 bg-gray-800/80 border border-gray-600/50 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-gray-500 font-sf-pro backdrop-blur-sm"
+                  required
+                  className="flex-1 px-6 py-4 bg-gray-800/80 border border-gray-600/50 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-gray-500 font-sf-pro backdrop-blur-sm disabled:opacity-50"
+                  disabled={waitlistStatus === "loading"}
                 />
                 <motion.button
-                  className="bg-white text-black px-[15px] py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 font-sf-pro whitespace-nowrap"
+                  type="submit"
+                  className={`px-[15px] py-4 rounded-full font-semibold transition-all duration-300 font-sf-pro whitespace-nowrap flex items-center justify-center gap-2 ${
+                    waitlistStatus === "success"
+                      ? "bg-green-500 text-white hover:bg-green-500"
+                      : waitlistStatus === "error"
+                      ? "bg-red-500 text-white hover:bg-red-500"
+                      : "bg-white text-black hover:bg-gray-100"
+                  }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  disabled={waitlistStatus === "loading"}
                 >
-                  Get Notified
+                  {waitlistStatus === "loading" && (
+                    <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  )}
+                  {waitlistStatus === "idle" && "Get Notified"}
+                  {waitlistStatus === "loading" && "Submitting"}
+                  {waitlistStatus === "success" && "Added"}
+                  {waitlistStatus === "error" && "Retry"}
                 </motion.button>
-              </div>
+              </form>
+              {waitlistError && (
+                <div className="mt-3 text-xs text-red-400 font-sf-pro">
+                  {waitlistError}
+                </div>
+              )}
+              {waitlistStatus === "success" && !waitlistError && (
+                <div className="mt-3 text-xs text-green-400 font-sf-pro">
+                  You're on the list! 🎉
+                </div>
+              )}
             </motion.div>
           </div>
         </section>
@@ -1245,25 +1555,23 @@ function OrbitingThemes({ planets }: { planets: readonly Planet[] }) {
         ))}
       </div>
 
-      {/* planets - ensure proper z-index and clickability */}
-      <div className="relative z-20">
-        {assignments.map(({ planet, ring, start, diameter }, i) => (
-          <PlanetOnOrbit
-            key={planet.key}
-            planet={planet}
-            radius={ring.radius}
-            speed={ring.speed}
-            startDeg={start}
-            diameter={diameter}
-            paused={paused || Boolean(active)}
-            onActivate={() => {
-              console.log(`Clicked planet: ${planet.name}`); // Debug log
-              setActive(planet);
-              setPaused(true);
-            }}
-          />
-        ))}
-      </div>
+      {/* planets - restored direct mapping for smoother orbital feel */}
+      {assignments.map(({ planet, ring, start, diameter }, i) => (
+        <PlanetOnOrbit
+          key={planet.key}
+          planet={planet}
+          radius={ring.radius}
+          speed={ring.speed}
+          startDeg={start}
+          diameter={diameter}
+          paused={paused || Boolean(active)}
+          onActivate={() => {
+            console.log(`Clicked planet: ${planet.name}`);
+            setActive(planet);
+            setPaused(true);
+          }}
+        />
+      ))}
 
       {/* legend */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-sm font-sf-pro text-center pointer-events-none z-10">
@@ -1300,45 +1608,36 @@ function PlanetOnOrbit({
 
   return (
     <motion.div
-      className="absolute [transform-style:preserve-3d] z-30"
+      className="absolute [transform-style:preserve-3d]"
       style={{ width: radius * 2, height: radius * 2 }}
       animate={paused ? { rotate: startDeg } : { rotate: 360 + startDeg }}
       initial={{ rotate: startDeg }}
       transition={{ repeat: Infinity, ease: "linear", duration }}
     >
       <div
-        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)] z-40"
+        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)]"
         style={{ transform: `translate(${radius}px, -50%)` }}
       >
         <button
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onActivate();
-          }}
-          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full z-50 cursor-pointer"
+          onClick={onActivate}
+          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full cursor-pointer"
           aria-label={`${planet.name} theme`}
-          style={{ pointerEvents: "auto", isolation: "isolate" }}
+          style={{ pointerEvents: "auto" }}
         >
           {/* planet body with 3D lighting */}
           <div
-            className={`relative rounded-full bg-gradient-to-br ${planet.gradient} shadow-[0_0_32px_rgba(255,255,255,0.2)] border-2 border-white/20 cursor-pointer`}
+            className={`relative rounded-full bg-gradient-to-br ${planet.gradient} shadow-[0_0_32px_rgba(255,255,255,0.2)] border-2 border-white/20`}
             style={{ width: diameter, height: diameter }}
           >
-            {/* highlight */}
             <div className="absolute -top-2 -left-2 w-12 h-12 rounded-full bg-white/30 blur-md" />
-            {/* limb shadow */}
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_70%_80%,transparent_40%,rgba(0,0,0,0.4)_75%)]" />
-            {/* drop shadow to plane */}
             <div
               className="absolute -bottom-3 left-1/2 -translate-x-1/2 h-3 rounded-full bg-black/50 blur-lg"
               style={{ width: Math.max(32, diameter * 0.7) }}
             />
           </div>
-
-          {/* label */}
           <div className="absolute left-1/2 -translate-x-1/2 mt-4 whitespace-nowrap text-center">
             <div className="text-white text-base font-semibold font-sf-pro">
               {planet.name}
@@ -1347,8 +1646,6 @@ function PlanetOnOrbit({
               {planet.tagline}
             </div>
           </div>
-
-          {/* enhanced halo on hover */}
           <div
             className={`pointer-events-none absolute inset-0 rounded-full transition-all duration-500 ${
               hover
@@ -1356,8 +1653,6 @@ function PlanetOnOrbit({
                 : "ring-0 scale-100"
             }`}
           />
-
-          {/* click indicator */}
           <div
             className={`pointer-events-none absolute inset-0 rounded-full bg-white/10 transition-opacity duration-200 ${
               hover ? "opacity-100" : "opacity-0"
