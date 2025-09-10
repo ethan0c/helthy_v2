@@ -92,6 +92,39 @@ body {
   }
 }
 
+/* Video background optimizations */
+video {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Seamless video gradient overlays */
+.video-gradient-overlay {
+  background: linear-gradient(
+    180deg, 
+    rgba(0,0,0,0.7) 0%, 
+    rgba(0,0,0,0.4) 30%, 
+    rgba(0,0,0,0.5) 70%, 
+    rgba(0,0,0,0.8) 100%
+  );
+}
+
+.video-fade-in {
+  animation: videoFadeIn 2s ease-out;
+}
+
+@keyframes videoFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Glass morphism effect */
 .glass {
   background: rgba(255, 255, 255, 0.05);

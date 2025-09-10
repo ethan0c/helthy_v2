@@ -193,8 +193,8 @@ export default function Home() {
 
   return (
     <>
-      {/* iPhone Body - Black bezel around entire viewport */}
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-1 sm:p-3 lg:p-6">
+      {/* iPhone Body - Silver bezel with white background */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-300 via-slate-200 to-slate-300 px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
         {/* iPhone Screen - Dark curved edges with dark background */}
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl">
           <LayoutGroup id="ai-group">
@@ -219,7 +219,7 @@ export default function Home() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-2 bg-black rounded-full px-4 py-2"
                     >
                       <div className="w-2 h-2 bg-white/80 rounded-full"></div>
                       <div className="w-16 h-1 bg-white/60 rounded-full"></div>
@@ -231,7 +231,7 @@ export default function Home() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3, delay: 0.2 }}
-                      className="flex items-center justify-between w-full px-[15px] text-sm font-medium text-white"
+                      className="flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black rounded-full"
                     >
                       <Image
                         src="/logo-white.png"
@@ -292,11 +292,33 @@ export default function Home() {
               id="home"
               className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
             >
-              {/* Clean, simple background */}
+              {/* Video Background */}
               <div className="absolute inset-0">
-                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-slate-300/30 to-gray-400/20 rounded-full blur-3xl opacity-50"></div>
-                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-gray-300/25 to-slate-400/15 rounded-full blur-3xl opacity-40"></div>
-                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-zinc-300/20 to-gray-500/10 rounded-full blur-2xl opacity-30"></div>
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover video-fade-in"
+                  style={{
+                    filter: "brightness(0.8) contrast(1.1)",
+                    WebkitFilter: "brightness(0.8) contrast(1.1)",
+                  }}
+                >
+                  <source
+                    src="/325e6dc6-23c3-4836-b68e-aefe6b4997a6.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+
+                {/* Seamless gradient overlay for better text readability */}
+                <div className="absolute inset-0 video-gradient-overlay"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40"></div>
+
+                {/* Atmospheric enhancement gradients */}
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-white/8 to-gray-300/3 rounded-full blur-3xl opacity-40"></div>
+                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-gray-300/6 to-white/3 rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-gray-200/4 to-gray-400/6 rounded-full blur-2xl opacity-25"></div>
               </div>
 
               <div className="relative z-10 px-8 w-full max-w-7xl mx-auto text-center mt-16">
@@ -308,7 +330,7 @@ export default function Home() {
                   <SectionMeta
                     label="Home"
                     number="01"
-                    tone="light"
+                    tone="dark"
                     className="text-left"
                   />
                   {/* Status Bar Space */}
@@ -316,21 +338,23 @@ export default function Home() {
 
                   {/* Main Greeting */}
                   <div className="mb-12">
-                    <h3 className="text-lg text-gray-600 mb-4 font-sf-pro font-light">
-                      Good morning, Alex
-                    </h3>
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6 font-inter leading-tight">
-                      Stop guessing.{" "}
-                      <span className="bg-gradient-to-r from-slate-700 via-gray-800 to-zinc-900 bg-clip-text text-transparent italic">
-                        Start knowing.
+                    <div className="text-sm text-gray-400 mb-2 font-sf-pro font-light tracking-wider uppercase">
+                      Helthy Presents
+                    </div>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-2 font-inter leading-[0.9] tracking-tight">
+                      FITNESS{" "}
+                      <span className="bg-gradient-to-r from-gray-100 via-white to-gray-200 bg-clip-text text-transparent">
+                        REVOLUTION
                       </span>
                     </h1>
-                    <p className="text-xl md:text-2xl text-gray-600 font-sf-pro font-light max-w-4xl mx-auto leading-relaxed">
-                      Every workout you do without data is a missed opportunity.
-                      Every meal you eat without tracking is progress left on
-                      the table. Helthy gives you the insights you need to
-                      finally break through plateaus and achieve the results
-                      you've been chasing.
+                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 font-inter leading-tight">
+                      Enter the Data Zone
+                    </h2>
+                    <p className="text-lg md:text-xl text-gray-300 font-sf-pro font-light max-w-3xl mx-auto leading-relaxed">
+                      Join the movement to see the reveal of next-generation
+                      fitness tracking.
+                      <br />
+                      Transform your body with precision, not guesswork.
                     </p>
                   </div>
 
@@ -345,24 +369,20 @@ export default function Home() {
                   >
                     <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                       <motion.button
-                        className="bg-gradient-to-r from-gray-800 to-black text-white px-12 py-5 rounded-full text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
+                        className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-5 rounded-full text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         Start Your Journey
                       </motion.button>
                       <motion.button
-                        className="border-2 border-gray-400 text-gray-700 px-12 py-5 rounded-full text-lg font-semibold hover:border-gray-600 hover:bg-gray-50 transition-all duration-300 font-sf-pro"
+                        className="border-2 border-gray-400 text-gray-300 px-12 py-5 rounded-full text-lg font-semibold hover:border-gray-300 hover:bg-gray-800/50 transition-all duration-300 font-sf-pro"
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         Join Waitlist
                       </motion.button>
                     </div>
-                    <p className="text-gray-500 text-sm font-sf-pro">
-                      Join 10,000+ users already transforming their fitness
-                      journey
-                    </p>
                   </motion.div>
                 </motion.div>
               </div>
@@ -380,22 +400,23 @@ export default function Home() {
             {/* Features Section - Inside iPhone */}
             <section
               id="features"
-              className="py-32 px-8 relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-50"
+              className="py-32 px-8 relative overflow-hidden bg-gradient-to-b from-gray-900/95 via-gray-800 to-gray-900"
             >
-              {/* Subtle gradient that blends into AI section */}
+              {/* Seamless transition gradient from hero video */}
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white/0"></div>
+                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 via-black/60 to-transparent"></div>
+                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-gray-900/0"></div>
               </div>
 
               <div className="max-w-7xl mx-auto relative z-10">
-                <SectionMeta label="Features" number="02" tone="light" />
+                <SectionMeta label="Features" number="02" tone="dark" />
 
                 {/* Features description */}
                 <div className="mb-16 text-left">
-                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-inter">
+                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-inter">
                     Everything you need to succeed
                   </h2>
-                  <p className="text-lg text-gray-600 font-sf-pro max-w-xl">
+                  <p className="text-lg text-gray-300 font-sf-pro max-w-xl">
                     Create custom workouts, track your progress, plan meals, and
                     get AI-powered insights—all in one intelligent platform
                     designed for real results.
@@ -503,7 +524,7 @@ export default function Home() {
 
                 {/* Short description below the feature cards */}
                 <div className="mt-8">
-                  <p className="text-base text-gray-600 font-sf-pro max-w-2xl">
+                  <p className="text-base text-gray-300 font-sf-pro max-w-2xl">
                     Explore core Helthy features at a glance. Tap any card to
                     open deeper tools—workouts, meal planning, and AI insights
                     are all designed to occupy the screen so you can focus on
@@ -546,7 +567,7 @@ export default function Home() {
             {/* AI Section - Inside iPhone */}
             <section
               id="ai"
-              className="py-32 px-8 bg-gradient-to-br from-gray-50 to-white"
+              className="py-32 px-8 bg-gradient-to-br from-gray-800 to-gray-900"
             >
               <div className="max-w-7xl mx-auto">
                 {/* Sentinel for auto-expansion trigger */}
@@ -555,7 +576,7 @@ export default function Home() {
                   aria-hidden
                   className="h-1 w-1"
                 />
-                <SectionMeta label="AI" number="03" tone="light" />
+                <SectionMeta label="AI" number="03" tone="dark" />
                 <AnimatePresence initial={false}>
                   {aiExpanded && (
                     <motion.div
@@ -613,10 +634,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Outside iPhone Screen - Dark Background Sections */}
-      <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
+      {/* Outside iPhone Screen - Black Background Sections */}
+      <div className="bg-black text-white">
         {/* Themes Section - Solar system with orbiting planets */}
-        <section id="themes" className="py-32 px-8 relative overflow-hidden">
+        <section
+          id="themes"
+          className="py-32 px-8 relative overflow-hidden bg-black"
+        >
           <div className="max-w-7xl mx-auto text-center mb-20">
             <SectionMeta
               label="Themes"
@@ -648,7 +672,7 @@ export default function Home() {
         </div>
 
         {/* FAQ Section - Dark mode layout inspired by the reference */}
-        <section id="faq" className="py-32 px-8">
+        <section id="faq" className="py-32 px-8 bg-black">
           <div className="max-w-7xl mx-auto">
             <SectionMeta label="FAQ" number="05" tone="dark" />
 
@@ -1025,7 +1049,7 @@ function AIInsightsCard({
 }) {
   return (
     <div
-      className={`bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-lg rounded-3xl border border-gray-300 shadow-lg p-6 flex flex-col ${className}`}
+      className={`bg-gradient-to-br from-gray-800/90 via-gray-700/90 to-gray-800/90 backdrop-blur-lg rounded-3xl border border-gray-600 shadow-lg p-6 flex flex-col ${className}`}
     >
       {image && (
         <div className="relative w-full h-36 rounded-xl overflow-hidden mb-3">
@@ -1062,17 +1086,17 @@ function AIInsightsCard({
 function VoiceLoggingCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-gray-200 bg-white/65 backdrop-blur-lg p-5 shadow-lg ${className}`}
+      className={`rounded-2xl border border-gray-600 bg-gray-800/65 backdrop-blur-lg p-5 shadow-lg ${className}`}
     >
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center">
+        <div className="w-8 h-8 rounded-xl bg-gray-700 text-white flex items-center justify-center">
           <Mic className="w-4 h-4" />
         </div>
-        <h4 className="text-sm font-semibold text-gray-900 font-sf-pro">
+        <h4 className="text-sm font-semibold text-white font-sf-pro">
           Voice logging
         </h4>
       </div>
-      <p className="text-xs text-gray-600 font-sf-pro mb-4">
+      <p className="text-xs text-gray-300 font-sf-pro mb-4">
         Log workouts and meals hands‑free.
       </p>
 

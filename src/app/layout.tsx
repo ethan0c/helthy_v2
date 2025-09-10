@@ -25,6 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="preload"
+          href="/325e6dc6-23c3-4836-b68e-aefe6b4997a6.mp4"
+          as="video"
+          type="video/mp4"
+        />
+      </head>
       <body
         className={`${inter.variable} antialiased`}
         suppressHydrationWarning={true}
