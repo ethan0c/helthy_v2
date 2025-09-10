@@ -3,12 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
-import { 
+import {
   Brain,
   ChevronDown,
   Mic,
-  Sparkles,
-  ShieldCheck,
   Wand2,
   MessageSquare,
   Send,
@@ -73,9 +71,11 @@ export default function Home() {
       if (!res.ok || !data.ok) throw new Error(data.error || "Failed");
       setWaitlistStatus("success");
       setEmail("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setWaitlistStatus("error");
-      setWaitlistError(err.message || "Something went wrong");
+      setWaitlistError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
     } finally {
       setTimeout(() => {
         setWaitlistStatus("idle");
@@ -761,7 +761,6 @@ export default function Home() {
                     const monthlyBase = 15.99;
                     const annualBase = monthlyBase * 12; // 191.88
                     const discountRate = 0.4; // 40%
-                    const annualDiscounted = annualBase * (1 - discountRate); // 115.128
                     const annualDisplay = 114.99; // prettier number
                     const monthlyDiscounted = (
                       monthlyBase *
@@ -947,17 +946,17 @@ export default function Home() {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {faqs.map((faq, index) => (
+              {faqs.map((faq) => (
                 <motion.div
                   key={faq.question}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                  transition={{ duration: 0.5 }}
                   className="rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors p-8 flex flex-col h-full"
                 >
                   <div className="text-6xl sm:text-7xl font-extrabold text-white/90 font-sf-pro">
-                    {(index + 1).toString().padStart(2, "0")}
+                    01
                     <span className="text-white/40">.</span>
                   </div>
                   <h3 className="mt-6 text-lg font-semibold text-white font-sf-pro">
@@ -1256,8 +1255,8 @@ export default function Home() {
                       Get Notified
                     </h4>
                     <p className="text-gray-400 text-sm font-sf-pro">
-                      Click &quot;Get Notified&quot; and we&apos;ll add you to our exclusive
-                      early access list.
+                      Click &quot;Get Notified&quot; and we&apos;ll add you to
+                      our exclusive early access list.
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded-2xl p-6 text-center">
