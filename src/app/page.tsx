@@ -3,17 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
-import {
-  Activity,
+import { 
   Brain,
-  Target,
-  Zap,
   ChevronDown,
-  X,
   Mic,
-  MessageSquare,
+  Sparkles,
+  ShieldCheck,
   Wand2,
+  MessageSquare,
   Send,
+  X,
 } from "lucide-react";
 
 // Reusable small top meta row with divider, label, and number bubble
@@ -1069,7 +1068,7 @@ export default function Home() {
               )}
               {waitlistStatus === "success" && !waitlistError && (
                 <div className="mt-3 text-xs text-green-400 font-sf-pro">
-                  You're on the list! 🎉
+                  You&apos;re on the list! 🎉
                 </div>
               )}
             </motion.div>
@@ -1257,7 +1256,7 @@ export default function Home() {
                       Get Notified
                     </h4>
                     <p className="text-gray-400 text-sm font-sf-pro">
-                      Click "Get Notified" and we'll add you to our exclusive
+                      Click &quot;Get Notified&quot; and we&apos;ll add you to our exclusive
                       early access list.
                     </p>
                   </div>
