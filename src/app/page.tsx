@@ -314,7 +314,7 @@ export default function Home() {
                   : isNavExpanded
                   ? "calc(100% - 48px)"
                   : 384,
-                height: isNavExpanded ? 64 : 84,
+                height: isInThemesSection ? 64 : isNavExpanded ? 64 : 84,
                 y: isInThemesSection ? 0 : isNavExpanded ? 10 : 0,
                 opacity: isInThemesSection ? 1 : isDynamicIslandVisible ? 1 : 0,
                 scale: isInThemesSection ? 1 : isDynamicIslandVisible ? 1 : 0.8,
