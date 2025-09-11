@@ -89,8 +89,6 @@ export default function Home() {
   >("monthly");
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isInThemesSection, setIsInThemesSection] = useState(false);
-  // Stick full-width navbar from Themes onward
-  const [isCosmic, setIsCosmic] = useState(false);
   // bezel expansion + auto AI section
   const [showFeatureAI, setShowFeatureAI] = useState(false);
   const [shouldExpandPhone, setShouldExpandPhone] = useState(false);
@@ -98,7 +96,6 @@ export default function Home() {
   const ctaContainerRef = useRef<HTMLDivElement | null>(null);
   const aiAutoRef = useRef<HTMLDivElement | null>(null);
   const themesRef = useRef<HTMLDivElement | null>(null);
-  const themesTopRef = useRef<number | null>(null);
   const aiInView = useInView(aiAutoRef, { amount: 0.3, once: true });
   // trigger AI section when sentinel enters view
   useEffect(() => {
@@ -111,27 +108,28 @@ export default function Home() {
       const scrollingUp = currentScrollY < lastScrollY;
       const hasScrolledDown = currentScrollY > 100;
 
-      // Check if we're in themes section
+      // Check if we're in themes section or beyond (cosmic sections)
       const themesElement = themesRef.current;
-      let inThemes = false;
+      let inCosmic = false;
       if (themesElement) {
         const rect = themesElement.getBoundingClientRect();
-        inThemes = rect.top <= 100 && rect.bottom > 0;
+        // We're in cosmic sections if themes section has reached the top
+        inCosmic = rect.top <= 100;
       }
 
       setLastScrollY(currentScrollY);
-      setIsInThemesSection(inThemes);
+      setIsInThemesSection(inCosmic);
 
       if (!hasScrolledDown) {
         // At top of page - show Dynamic Island in original state
         setIsNavExpanded(false);
         setIsDynamicIslandVisible(true);
-      } else if (inThemes) {
-        // In themes section - navbar should be sticky at top and full width
+      } else if (inCosmic) {
+        // In cosmic sections - navbar should be sticky at top and full width
         setIsNavExpanded(true);
         setIsDynamicIslandVisible(true);
       } else {
-        // After scrolling down - show navbar expansion based on scroll direction
+        // In iPhone sections - show navbar expansion based on scroll direction
         setIsNavExpanded(scrollingUp);
         setIsDynamicIslandVisible(scrollingUp);
       }
@@ -140,21 +138,6 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
-
-  // Track when we reach themes section for navbar behavior
-  useEffect(() => {
-    const handleThemesScroll = () => {
-      const themesEl = themesRef.current;
-      if (!themesEl) return;
-      const rect = themesEl.getBoundingClientRect();
-      const inThemes = rect.top <= 100; // Trigger when themes section is near top
-      setIsInThemesSection(inThemes);
-    };
-
-    handleThemesScroll();
-    window.addEventListener("scroll", handleThemesScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleThemesScroll);
-  }, []);
 
   // Bezel expansion after CTA buttons fully leave viewport
   useEffect(() => {
@@ -166,22 +149,6 @@ export default function Home() {
       const fullyAbove = rect.bottom <= -50;
 
       setShouldExpandPhone(fullyAbove);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Determine when we've entered the cosmic sections (Themes → end)
-  useEffect(() => {
-    const el = themesRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    themesTopRef.current = rect.top + window.scrollY;
-
-    const onScroll = () => {
-      const threshold = (themesTopRef.current ?? 0) - 8; // minimal offset
-      setIsCosmic(window.scrollY >= threshold);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
