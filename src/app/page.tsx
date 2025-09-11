@@ -130,12 +130,16 @@ export default function Home() {
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const fullyAbove = rect.bottom <= 0; // entire CTA area has scrolled above
-      setShouldExpandPhone(fullyAbove);
+      
+      // Add some buffer to make the transition smoother
+      if (fullyAbove !== shouldExpandPhone) {
+        setShouldExpandPhone(fullyAbove);
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [shouldExpandPhone]);
 
   // Keep manual collapse state persistent - don't reset it automatically
   // This ensures once user closes AI, it stays closed until they manually open it again
@@ -232,14 +236,18 @@ export default function Home() {
       <div className="min-h-screen bg-black flex items-start justify-center px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
         {/* iPhone Screen with silver border following the curved shape */}
         <motion.div
-          className="w-full max-w-6xl bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
+          className="w-full bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
           style={{ willChange: "transform, max-width" }}
-          initial={false}
+          initial={{ maxWidth: "72rem" }}
           animate={{
-            maxWidth: shouldExpandPhone ? "100%" : "72rem",
+            maxWidth: shouldExpandPhone ? "calc(100% - 2rem)" : "72rem",
             width: "100%",
           }}
-          transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ 
+            duration: 1.2, 
+            ease: [0.25, 0.46, 0.45, 0.94],
+            type: "tween"
+          }}
         >
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
@@ -547,17 +555,17 @@ export default function Home() {
                   ].map((card, i) => (
                     <motion.div
                       key={card.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
                       viewport={{
                         once: true,
-                        amount: 0.3,
-                        margin: "0px 0px -100px 0px",
+                        amount: 0.2,
+                        margin: "0px 0px -150px 0px",
                       }}
                       transition={{
-                        duration: 0.6,
+                        duration: 0.8,
                         ease: [0.25, 0.46, 0.45, 0.94],
-                        delay: i * 0.1,
+                        delay: i * 0.2,
                       }}
                       className="group relative h-[740px] lg:h-[780px] overflow-hidden bg-transparent"
                     >
@@ -598,7 +606,7 @@ export default function Home() {
                     y: showFeatureAI ? 40 : 0,
                   }}
                   transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="mt-20 mx-auto bg-gradient-to-br from-gray-200/90 via-gray-100/90 to-gray-200/90 backdrop-blur-xl border border-gray-300/70 shadow-2xl overflow-hidden relative"
+                  className="mt-20 mx-auto bg-gradient-to-br from-black/90 via-gray-900/90 to-black/90 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden relative"
                   style={{
                     paddingLeft: showFeatureAI ? 24 : 0,
                     paddingRight: showFeatureAI ? 24 : 0,
@@ -615,9 +623,9 @@ export default function Home() {
                       className="flex items-center justify-center h-full w-full"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-3 h-3 bg-gray-600/60 rounded-full"></div>
-                        <div className="w-20 h-1.5 bg-gray-600/40 rounded-full"></div>
-                        <div className="text-xs text-gray-600 font-sf-pro">
+                        <div className="w-3 h-3 bg-white/60 rounded-full shadow-sm shadow-white/20"></div>
+                        <div className="w-20 h-1.5 bg-white/40 rounded-full"></div>
+                        <div className="text-xs text-white/80 font-sf-pro tracking-wide">
                           AI Coach
                         </div>
                       </div>
@@ -634,23 +642,32 @@ export default function Home() {
                     }}
                     className={showFeatureAI ? "block" : "hidden"}
                   >
-                    <div className="flex items-start justify-between mb-6">
-                      <div>
-                        <div className="text-xs text-gray-500 font-sf-pro uppercase tracking-wider">
-                          AI Coach
-                        </div>
-                        <div className="text-sm text-gray-600 font-sf-pro">
-                          Unified guidance across training & nutrition
+                    {/* Orbital glow effects */}
+                    <div className="absolute top-4 right-8 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-indigo-500/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-8 left-12 w-24 h-24 bg-gradient-to-br from-cyan-500/15 to-blue-500/10 rounded-full blur-2xl"></div>
+
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-6">
+                        <div>
+                          <div className="text-xs text-white/50 font-sf-pro uppercase tracking-wider mb-1">
+                            AI Coach
+                          </div>
+                          <div className="text-lg text-white/90 font-sf-pro font-medium">
+                            Unified guidance across training & nutrition
+                          </div>
+                          <div className="text-sm text-white/60 font-sf-pro mt-1">
+                            Your intelligent fitness companion in action
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className="flex flex-col gap-6">
-                        <VoiceLoggingCard className="h-60" />
-                        <AIDescribeCard className="h-60" />
-                      </div>
-                      <div className="lg:col-span-2">
-                        <AIChatPanel className="min-h-[520px]" />
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="flex flex-col gap-6">
+                          <VoiceLoggingCard className="h-60" />
+                          <AIDescribeCard className="h-60" />
+                        </div>
+                        <div className="lg:col-span-2">
+                          <AIChatPanel className="min-h-[520px]" />
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -661,6 +678,12 @@ export default function Home() {
             </section>
           </LayoutGroup>
         </motion.div>
+      </div>
+
+      {/* Cinematic transition from iPhone to cosmic sections */}
+      <div className="relative h-32 bg-gradient-to-b from-black via-gray-900/50 to-black overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0)_70%)]"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
       </div>
 
       {/* Outside iPhone Screen - Black Background Sections */}
@@ -679,15 +702,21 @@ export default function Home() {
           >
             <SectionMeta
               label="Themes"
-              number="04"
+              number="03"
               tone="dark"
               className="text-left"
             />
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase font-sf-pro">
-              Themes In Orbit
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-sf-pro mb-6">
+              <span className="italic font-light">Themes</span>{" "}
+              <span className="font-extrabold uppercase">In Orbit</span>
             </h2>
-            <p className="text-white/70 font-sf-pro max-w-2xl mx-auto">
-              Hover or click a planet to preview the app in that theme.
+            <p className="text-xl text-white/80 font-sf-pro max-w-3xl mx-auto mb-4 leading-relaxed">
+              Helthy adapts to you — even visually. Your interface becomes part
+              of your identity.
+            </p>
+            <p className="text-white/60 font-sf-pro max-w-2xl mx-auto text-sm">
+              Each theme transforms the entire experience. Hover or click any
+              planet to preview.
             </p>
           </motion.div>
 
@@ -695,13 +724,22 @@ export default function Home() {
           <OrbitingThemes planets={themePlanets} />
         </section>
 
+        {/* Transition: Themes → Pricing */}
+        <div
+          aria-hidden
+          className="relative h-24 bg-gradient-to-b from-black via-gray-950 to-black"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-20"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+        </div>
+
         {/* Pricing Section */}
         <section
           id="pricing"
           className="relative overflow-hidden bg-black px-8 py-32"
         >
           <div className="max-w-6xl mx-auto">
-            <SectionMeta label="Pricing" number="05" tone="dark" />
+            <SectionMeta label="Pricing" number="04" tone="dark" />
             <div className="grid lg:grid-cols-12 gap-14 items-start">
               {/* Copy / Value Prop */}
               <div className="lg:col-span-5 space-y-8">
@@ -742,9 +780,10 @@ export default function Home() {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="relative rounded-[46px] border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.03] to-transparent p-10 md:p-12 overflow-hidden"
                 >
-                  {/* subtle backdrop accents */}
-                  <div className="pointer-events-none absolute -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/10 blur-3xl" />
-                  <div className="pointer-events-none absolute bottom-0 left-0 w-80 h-80 rounded-full bg-gradient-to-tr from-sky-400/10 to-violet-400/5 blur-3xl" />
+                  {/* Orbital glow accents */}
+                  <div className="pointer-events-none absolute -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-500/25 to-indigo-500/15 blur-3xl animate-pulse"></div>
+                  <div className="pointer-events-none absolute bottom-0 left-0 w-80 h-80 rounded-full bg-gradient-to-tr from-cyan-400/15 to-violet-400/10 blur-3xl"></div>
+                  <div className="pointer-events-none absolute top-1/3 right-1/4 w-40 h-40 rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/5 blur-2xl"></div>
 
                   <div className="flex items-center justify-between mb-10 relative z-10">
                     <div>
@@ -907,30 +946,6 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        {/* Comparison strip */}
-                        <div className="mt-12 grid sm:grid-cols-4 gap-4 text-center">
-                          {[
-                            { label: "Programs", other: "3 apps" },
-                            { label: "Nutrition", other: "1 app" },
-                            { label: "Recovery", other: "1 app" },
-                            { label: "AI Coach", other: "—" },
-                          ].map((cell) => (
-                            <div
-                              key={cell.label}
-                              className="rounded-2xl bg-white/[0.04] border border-white/10 px-4 py-5 flex flex-col gap-2"
-                            >
-                              <div className="text-[11px] tracking-wider text-white/50 font-sf-pro uppercase">
-                                {cell.label}
-                              </div>
-                              <div className="text-xs font-sf-pro text-white/40 line-through">
-                                {cell.other}
-                              </div>
-                              <div className="text-sm font-semibold text-white font-sf-pro">
-                                Helthy
-                              </div>
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     );
                   })()}
@@ -948,7 +963,7 @@ export default function Home() {
         {/* FAQ Section - Dark mode layout inspired by the reference */}
         <section id="faq" className="py-32 px-8 bg-black">
           <div className="max-w-7xl mx-auto">
-            <SectionMeta label="FAQ" number="06" tone="dark" />
+            <SectionMeta label="FAQ" number="05" tone="dark" />
 
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -974,13 +989,13 @@ export default function Home() {
               transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {faqs.map((faq) => (
+              {faqs.map((faq, index) => (
                 <div
                   key={faq.question}
                   className="rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors p-8 flex flex-col h-full"
                 >
                   <div className="text-6xl sm:text-7xl font-extrabold text-white/90 font-sf-pro">
-                    01
+                    {String(index + 1).padStart(2, "0")}
                     <span className="text-white/40">.</span>
                   </div>
                   <h3 className="mt-6 text-lg font-semibold text-white font-sf-pro">
@@ -1033,7 +1048,7 @@ export default function Home() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <SectionMeta label="Waitlist" number="07" tone="dark" />
+              <SectionMeta label="Waitlist" number="06" tone="dark" />
               {/* Main heading - SF Pro with Playfair for "who wait" */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-4 leading-tight font-sf-pro tracking-tight">
                 <span className="font-medium">Good things come</span>
@@ -1111,14 +1126,15 @@ export default function Home() {
                 )}
                 {waitlistStatus === "success" && !waitlistError && (
                   <motion.div
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    initial={{ opacity: 0, y: 30, scale: 0.7, rotateX: -15 }}
                     animate={{
                       opacity: 1,
                       y: 0,
                       scale: 1,
+                      rotateX: 0,
                     }}
                     transition={{
-                      duration: 0.6,
+                      duration: 0.8,
                       ease: [0.34, 1.56, 0.64, 1],
                       delay: 0.1,
                     }}
