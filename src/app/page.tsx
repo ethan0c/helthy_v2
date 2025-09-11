@@ -68,7 +68,7 @@ export default function Home() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || "Failed");
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed");
       setWaitlistStatus("success");
       setEmail("");
     } catch (err: unknown) {
@@ -1084,16 +1084,129 @@ export default function Home() {
                   {waitlistStatus === "error" && "Retry"}
                 </motion.button>
               </form>
-              {waitlistError && (
-                <div className="mt-3 text-xs text-red-400 font-sf-pro">
-                  {waitlistError}
-                </div>
-              )}
-              {waitlistStatus === "success" && !waitlistError && (
-                <div className="mt-3 text-xs text-green-400 font-sf-pro">
-                  You&apos;re on the list! 🎉
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {waitlistError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-full text-center"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-sm text-red-400 font-sf-pro">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {waitlistError}
+                    </div>
+                  </motion.div>
+                )}
+                {waitlistStatus === "success" && !waitlistError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      ease: [0.34, 1.56, 0.64, 1],
+                      delay: 0.1,
+                    }}
+                    className="mt-4"
+                  >
+                    <div className="relative p-4 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-teal-500/10 border border-green-500/20 rounded-2xl text-center overflow-hidden">
+                      {/* Animated background glow */}
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1.5, opacity: [0, 0.3, 0] }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl"
+                      />
+
+                      {/* Success content */}
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.2,
+                            ease: "easeOut",
+                          }}
+                          className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                        >
+                          <svg
+                            className="w-5 h-5 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: 0.3 }}
+                          className="text-green-400 font-sf-pro"
+                        >
+                          <div className="font-semibold">
+                            Welcome aboard! 🚀
+                          </div>
+                          <div className="text-xs text-green-400/80 mt-1">
+                            You&apos;re on the exclusive early access list
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      {/* Celebration particles */}
+                      {[...Array(6)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{
+                            opacity: 0,
+                            scale: 0,
+                            x: 0,
+                            y: 0,
+                            rotate: 0,
+                          }}
+                          animate={{
+                            opacity: [0, 1, 0],
+                            scale: [0, 1, 0],
+                            x: Math.cos((i * 60 * Math.PI) / 180) * 30,
+                            y: Math.sin((i * 60 * Math.PI) / 180) * 30,
+                            rotate: 360,
+                          }}
+                          transition={{
+                            duration: 1.2,
+                            delay: 0.4 + i * 0.1,
+                            ease: "easeOut",
+                          }}
+                          className="absolute top-1/2 left-1/2 w-2 h-2 bg-green-400 rounded-full"
+                          style={{
+                            transformOrigin: "center",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         </section>
@@ -1245,80 +1358,6 @@ export default function Home() {
                     </a>
                   </li>
                 </ul>
-              </div>
-            </div>
-
-            {/* Waitlist Tutorial */}
-            <div className="border-t border-gray-800 pt-12 mb-8">
-              <div className="max-w-4xl mx-auto">
-                <h3 className="text-xl font-bold text-white font-sf-pro mb-6 text-center">
-                  🚀 Join the Waitlist in 3 Easy Steps
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-gray-800/50 rounded-2xl p-6 text-center">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-white font-bold font-sf-pro">
-                        1
-                      </span>
-                    </div>
-                    <h4 className="text-white font-semibold font-sf-pro mb-2">
-                      Enter Your Email
-                    </h4>
-                    <p className="text-gray-400 text-sm font-sf-pro">
-                      Scroll up to the waitlist section and enter your email
-                      address in the form.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-2xl p-6 text-center">
-                    <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-white font-bold font-sf-pro">
-                        2
-                      </span>
-                    </div>
-                    <h4 className="text-white font-semibold font-sf-pro mb-2">
-                      Get Notified
-                    </h4>
-                    <p className="text-gray-400 text-sm font-sf-pro">
-                      Click &quot;Get Notified&quot; and we&apos;ll add you to
-                      our exclusive early access list.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-2xl p-6 text-center">
-                    <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-white font-bold font-sf-pro">
-                        3
-                      </span>
-                    </div>
-                    <h4 className="text-white font-semibold font-sf-pro mb-2">
-                      Early Access
-                    </h4>
-                    <p className="text-gray-400 text-sm font-sf-pro">
-                      Be among the first to experience Helthy when we launch
-                      publicly.
-                    </p>
-                  </div>
-                </div>
-                <div className="text-center mt-8">
-                  <a
-                    href="#waitlist"
-                    className="inline-flex items-center px-6 py-3 bg-white text-black rounded-full font-semibold hover:bg-gray-100 transition-colors font-sf-pro"
-                  >
-                    Join Waitlist Now
-                    <svg
-                      className="w-4 h-4 ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 7l10 10M7 17l10-10"
-                      />
-                    </svg>
-                  </a>
-                </div>
               </div>
             </div>
 
