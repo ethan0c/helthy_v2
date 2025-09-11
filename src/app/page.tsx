@@ -113,7 +113,7 @@ export default function Home() {
         setIsNavExpanded(false);
         setIsDynamicIslandVisible(true);
       } else {
-        // After scrolling down - show/hide entire DI based on scroll direction
+        // After scrolling down - show navbar expansion based on scroll direction
         setIsNavExpanded(scrollingUp);
         setIsDynamicIslandVisible(scrollingUp);
       }
@@ -233,36 +233,44 @@ export default function Home() {
         {/* iPhone Screen with silver border following the curved shape */}
         <motion.div
           className="w-full max-w-6xl bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
-          style={{ willChange: "max-width" }}
+          style={{ willChange: "transform, max-width" }}
           initial={false}
           animate={{
             maxWidth: shouldExpandPhone ? "100%" : "72rem",
             width: "100%",
           }}
-          transition={{ duration: 1.15, ease: [0.4, 0.0, 0.2, 1] }}
+          transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
               className="fixed top-10 left-1/2 transform -translate-x-1/2 z-30"
               animate={{
-                width: isNavExpanded ? "54%" : 384,
+                width: isNavExpanded ? "calc(100% - 48px)" : 384,
                 height: isNavExpanded ? 64 : 84,
                 y: isNavExpanded ? 10 : 0,
                 opacity: isDynamicIslandVisible ? 1 : 0,
                 scale: isDynamicIslandVisible ? 1 : 0.8,
               }}
-              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                ease: [0.23, 1, 0.32, 1],
+                layout: { duration: 0.6 },
+              }}
+              style={{
+                willChange: "transform, width, height",
+                backfaceVisibility: "hidden",
+              }}
             >
-              <div className="w-full h-full dynamic-island rounded-full flex items-center justify-center">
+              <div className="w-full h-full dynamic-island rounded-full flex items-center justify-center overflow-hidden">
                 <AnimatePresence mode="wait">
                   {!isNavExpanded ? (
                     <motion.div
                       key="island"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
                       className="flex items-center space-x-2 bg-black rounded-full px-4 py-2"
                     >
                       <div className="w-2 h-2 bg-white/80 rounded-full"></div>
@@ -271,10 +279,14 @@ export default function Home() {
                   ) : (
                     <motion.div
                       key="navbar"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.4, 0, 0.2, 1],
+                        delay: 0.1,
+                      }}
                       className="flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black rounded-full"
                     >
                       <Image
@@ -477,7 +489,11 @@ export default function Home() {
             {/* Features Section - Redesigned with embedded AI overlay */}
             <section
               id="features"
-              className="relative overflow-hidden bg-[#0B0B0B] pt-44 pb-44 px-6 sm:px-10"
+              className="relative overflow-hidden bg-[#0B0B0B] py-32 px-8"
+              style={{
+                isolation: "isolate",
+                willChange: "auto",
+              }}
             >
               {/* Subtle top/bottom vignettes like reference */}
               <div className="pointer-events-none absolute inset-0">
@@ -486,29 +502,32 @@ export default function Home() {
               </div>
 
               <div className="relative z-10 max-w-[1500px] mx-auto">
-                <SectionMeta
-                  label="Features"
-                  number="02"
-                  tone="dark"
-                  className="mx-auto max-w-none"
-                />
-                <div className="text-center max-w-4xl mx-auto mb-24">
-                  <h2 className="text-[3.25rem] sm:text-[4.5rem] lg:text-[5.2rem] leading-[1.05] font-medium text-white font-sf-pro tracking-tight">
-                    <span className="italic font-light">Track</span>{" "}
-                    <span className="font-semibold">everything</span>
-                  </h2>
-                  <p className="mt-8 text-lg sm:text-xl text-white/80 font-sf-pro max-w-2xl mx-auto leading-relaxed">
-                    See every rep, meal, and recovery signal—unified and clear.
-                  </p>
-                  <div className="mt-10">
-                    <button className="px-7 py-4 rounded-2xl bg-[#1A1A1A] text-white/90 hover:text-white border border-white/10 font-mono text-xs tracking-wider uppercase shadow-inner shadow-white/5 hover:bg-[#222] transition-colors">
-                      More About Tracking
-                    </button>
+                <div style={{ transform: "translateZ(0)" }}>
+                  <SectionMeta
+                    label="Features"
+                    number="02"
+                    tone="dark"
+                    className="mx-auto max-w-none"
+                  />
+                  <div className="text-center max-w-4xl mx-auto mb-24">
+                    <h2 className="text-[3.25rem] sm:text-[4.5rem] lg:text-[5.2rem] leading-[1.05] font-medium text-white font-sf-pro tracking-tight">
+                      <span className="italic font-light">Track</span>{" "}
+                      <span className="font-semibold">everything</span>
+                    </h2>
+                    <p className="mt-8 text-lg sm:text-xl text-white/80 font-sf-pro max-w-2xl mx-auto leading-relaxed">
+                      See every rep, meal, and recovery signal—unified and
+                      clear.
+                    </p>
+                    <div className="mt-10">
+                      <button className="px-7 py-4 rounded-2xl bg-[#1A1A1A] text-white/90 hover:text-white border border-white/10 font-mono text-xs tracking-wider uppercase shadow-inner shadow-white/5 hover:bg-[#222] transition-colors">
+                        More About Tracking
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Three large feature cards */}
-                <div className="grid md:grid-cols-3 gap-3 xl:gap-4 relative">
+                {/* Three large feature cards - no containers, blended edges */}
+                <div className="grid md:grid-cols-3 gap-4 xl:gap-6 relative">
                   {[
                     {
                       title: "Monitor your training",
@@ -528,15 +547,19 @@ export default function Home() {
                   ].map((card, i) => (
                     <motion.div
                       key={card.title}
-                      initial={{ opacity: 0, y: 40 }}
+                      initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.4 }}
-                      transition={{
-                        duration: 0.75,
-                        ease: [0.4, 0, 0.2, 1],
-                        delay: i * 0.08,
+                      viewport={{
+                        once: true,
+                        amount: 0.3,
+                        margin: "0px 0px -100px 0px",
                       }}
-                      className="group relative h-[740px] lg:h-[780px] rounded-[50px] overflow-hidden bg-transparent shadow-[0_10px_42px_-12px_rgba(0,0,0,0.65)]"
+                      transition={{
+                        duration: 0.6,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                        delay: i * 0.1,
+                      }}
+                      className="group relative h-[740px] lg:h-[780px] overflow-hidden bg-transparent"
                     >
                       <div className="absolute inset-0">
                         <Image
@@ -544,22 +567,21 @@ export default function Home() {
                           alt={card.title}
                           fill
                           priority={i === 0}
-                          className="object-cover object-center transition-transform duration-[2400ms] ease-[cubic-bezier(.4,0,.2,1)] group-hover:scale-[1.065]"
+                          className="object-cover object-center transition-transform duration-[3000ms] ease-out group-hover:scale-[1.02]"
                         />
-                        {/* bottom blend into page background */}
-                        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/80 via-30% to-transparent" />
-                        {/* feather edge at very bottom to remove hard line */}
-                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0B0B0B] to-transparent opacity-90" />
+                        {/* Seamless bottom blend into page background */}
+                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/85 via-25% to-transparent" />
+                        {/* Extended feather edge for perfect blending */}
+                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0B0B0B] to-transparent" />
                       </div>
                       {/* Content bottom */}
-                      <div className="absolute inset-x-0 bottom-0 p-10 pt-32 flex flex-col">
-                        <h3 className="text-2xl sm:text-3xl font-semibold text-white font-inter mb-3 tracking-tight">
+                      <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10 pt-40 flex flex-col">
+                        <h3 className="text-2xl lg:text-3xl font-semibold text-white font-inter mb-4 tracking-tight leading-tight">
                           {card.title}
                         </h3>
-                        <p className="text-white/65 text-sm sm:text-base font-sf-pro leading-relaxed max-w-[92%]">
+                        <p className="text-white/70 text-sm lg:text-base font-sf-pro leading-relaxed max-w-[90%]">
                           {card.copy}
                         </p>
-                        {/* AI section appears automatically below when scrolled */}
                       </div>
                     </motion.div>
                   ))}
@@ -648,26 +670,26 @@ export default function Home() {
           id="themes"
           className="py-32 px-8 relative overflow-hidden bg-black"
         >
-          <div className="max-w-7xl mx-auto text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="max-w-7xl mx-auto text-center mb-20"
+          >
             <SectionMeta
               label="Themes"
               number="04"
               tone="dark"
               className="text-left"
             />
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase font-sf-pro"
-            >
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase font-sf-pro">
               Themes In Orbit
-            </motion.h2>
+            </h2>
             <p className="text-white/70 font-sf-pro max-w-2xl mx-auto">
               Hover or click a planet to preview the app in that theme.
             </p>
-          </div>
+          </motion.div>
 
           {/* Orbit system */}
           <OrbitingThemes planets={themePlanets} />
@@ -676,7 +698,7 @@ export default function Home() {
         {/* Pricing Section */}
         <section
           id="pricing"
-          className="relative overflow-hidden bg-black px-8 pt-8 pb-20"
+          className="relative overflow-hidden bg-black px-8 py-32"
         >
           <div className="max-w-6xl mx-auto">
             <SectionMeta label="Pricing" number="05" tone="dark" />
@@ -714,10 +736,10 @@ export default function Home() {
               {/* Pricing Card */}
               <div className="lg:col-span-7">
                 <motion.div
-                  initial={{ opacity: 0, y: 40 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   className="relative rounded-[46px] border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.03] to-transparent p-10 md:p-12 overflow-hidden"
                 >
                   {/* subtle backdrop accents */}
@@ -924,7 +946,7 @@ export default function Home() {
         </div>
 
         {/* FAQ Section - Dark mode layout inspired by the reference */}
-        <section id="faq" className="py-28 px-8 bg-black">
+        <section id="faq" className="py-32 px-8 bg-black">
           <div className="max-w-7xl mx-auto">
             <SectionMeta label="FAQ" number="06" tone="dark" />
 
@@ -945,14 +967,16 @@ export default function Home() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {faqs.map((faq) => (
-                <motion.div
+                <div
                   key={faq.question}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
                   className="rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors p-8 flex flex-col h-full"
                 >
                   <div className="text-6xl sm:text-7xl font-extrabold text-white/90 font-sf-pro">
@@ -965,9 +989,9 @@ export default function Home() {
                   <p className="mt-4 text-sm leading-6 text-white/70 font-sf-pro">
                     {faq.answer}
                   </p>
-                </motion.div>
+                </div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -979,7 +1003,7 @@ export default function Home() {
         {/* Waitlist Section - Matching reference design */}
         <section
           id="waitlist"
-          className="relative px-8 py-40 flex items-center justify-center overflow-hidden"
+          className="relative px-8 py-32 flex items-center justify-center overflow-hidden"
         >
           {/* Gradient Background with Earth Horizon - Softer blending */}
           <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black">
@@ -1004,10 +1028,10 @@ export default function Home() {
 
           <div className="relative z-10 max-w-7xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <SectionMeta label="Waitlist" number="07" tone="dark" />
               {/* Main heading - SF Pro with Playfair for "who wait" */}
