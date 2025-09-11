@@ -88,12 +88,17 @@ export default function Home() {
     "monthly" | "annual" | "lifetime"
   >("monthly");
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isInThemesSection, setIsInThemesSection] = useState(false);
+  // Stick full-width navbar from Themes onward
+  const [isCosmic, setIsCosmic] = useState(false);
   // bezel expansion + auto AI section
   const [showFeatureAI, setShowFeatureAI] = useState(false);
   const [shouldExpandPhone, setShouldExpandPhone] = useState(false);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const ctaContainerRef = useRef<HTMLDivElement | null>(null);
   const aiAutoRef = useRef<HTMLDivElement | null>(null);
+  const themesRef = useRef<HTMLDivElement | null>(null);
+  const themesTopRef = useRef<number | null>(null);
   const aiInView = useInView(aiAutoRef, { amount: 0.3, once: true });
   // trigger AI section when sentinel enters view
   useEffect(() => {
@@ -106,11 +111,24 @@ export default function Home() {
       const scrollingUp = currentScrollY < lastScrollY;
       const hasScrolledDown = currentScrollY > 100;
 
+      // Check if we're in themes section
+      const themesElement = themesRef.current;
+      let inThemes = false;
+      if (themesElement) {
+        const rect = themesElement.getBoundingClientRect();
+        inThemes = rect.top <= 100 && rect.bottom > 0;
+      }
+
       setLastScrollY(currentScrollY);
+      setIsInThemesSection(inThemes);
 
       if (!hasScrolledDown) {
         // At top of page - show Dynamic Island in original state
         setIsNavExpanded(false);
+        setIsDynamicIslandVisible(true);
+      } else if (inThemes) {
+        // In themes section - navbar should be sticky at top and full width
+        setIsNavExpanded(true);
         setIsDynamicIslandVisible(true);
       } else {
         // After scrolling down - show navbar expansion based on scroll direction
@@ -123,23 +141,52 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  // Track when we reach themes section for navbar behavior
+  useEffect(() => {
+    const handleThemesScroll = () => {
+      const themesEl = themesRef.current;
+      if (!themesEl) return;
+      const rect = themesEl.getBoundingClientRect();
+      const inThemes = rect.top <= 100; // Trigger when themes section is near top
+      setIsInThemesSection(inThemes);
+    };
+
+    handleThemesScroll();
+    window.addEventListener("scroll", handleThemesScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleThemesScroll);
+  }, []);
+
   // Bezel expansion after CTA buttons fully leave viewport
   useEffect(() => {
     const onScroll = () => {
       const el = ctaContainerRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const fullyAbove = rect.bottom <= 0; // entire CTA area has scrolled above
-      
-      // Add some buffer to make the transition smoother
-      if (fullyAbove !== shouldExpandPhone) {
-        setShouldExpandPhone(fullyAbove);
-      }
+      // Add buffer zone for smoother transition
+      const fullyAbove = rect.bottom <= -50;
+
+      setShouldExpandPhone(fullyAbove);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [shouldExpandPhone]);
+  }, []);
+
+  // Determine when we've entered the cosmic sections (Themes → end)
+  useEffect(() => {
+    const el = themesRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    themesTopRef.current = rect.top + window.scrollY;
+
+    const onScroll = () => {
+      const threshold = (themesTopRef.current ?? 0) - 8; // minimal offset
+      setIsCosmic(window.scrollY >= threshold);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Keep manual collapse state persistent - don't reset it automatically
   // This ensures once user closes AI, it stays closed until they manually open it again
@@ -237,28 +284,40 @@ export default function Home() {
         {/* iPhone Screen with silver border following the curved shape */}
         <motion.div
           className="w-full bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
-          style={{ willChange: "transform, max-width" }}
+          style={{
+            willChange: "transform, max-width",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
           initial={{ maxWidth: "72rem" }}
           animate={{
             maxWidth: shouldExpandPhone ? "calc(100% - 2rem)" : "72rem",
             width: "100%",
           }}
-          transition={{ 
-            duration: 1.2, 
-            ease: [0.25, 0.46, 0.45, 0.94],
-            type: "tween"
+          transition={{
+            duration: 1.8,
+            ease: [0.19, 1, 0.22, 1],
+            type: "tween",
           }}
         >
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
-              className="fixed top-10 left-1/2 transform -translate-x-1/2 z-30"
+              className={`fixed z-30 ${
+                isInThemesSection
+                  ? "top-0 left-0 right-0"
+                  : "top-10 left-1/2 transform -translate-x-1/2"
+              }`}
               animate={{
-                width: isNavExpanded ? "calc(100% - 48px)" : 384,
+                width: isInThemesSection
+                  ? "100%"
+                  : isNavExpanded
+                  ? "calc(100% - 48px)"
+                  : 384,
                 height: isNavExpanded ? 64 : 84,
-                y: isNavExpanded ? 10 : 0,
-                opacity: isDynamicIslandVisible ? 1 : 0,
-                scale: isDynamicIslandVisible ? 1 : 0.8,
+                y: isInThemesSection ? 0 : isNavExpanded ? 10 : 0,
+                opacity: isInThemesSection ? 1 : isDynamicIslandVisible ? 1 : 0,
+                scale: isInThemesSection ? 1 : isDynamicIslandVisible ? 1 : 0.8,
               }}
               transition={{
                 duration: 0.6,
@@ -270,21 +329,15 @@ export default function Home() {
                 backfaceVisibility: "hidden",
               }}
             >
-              <div className="w-full h-full dynamic-island rounded-full flex items-center justify-center overflow-hidden">
+              <div
+                className={`w-full h-full ${
+                  isInThemesSection
+                    ? ""
+                    : "dynamic-island rounded-full overflow-hidden"
+                } flex items-center justify-center`}
+              >
                 <AnimatePresence mode="wait">
-                  {!isNavExpanded ? (
-                    <motion.div
-                      key="island"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.25, ease: "easeOut" }}
-                      className="flex items-center space-x-2 bg-black rounded-full px-4 py-2"
-                    >
-                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                      <div className="w-16 h-1 bg-white/60 rounded-full"></div>
-                    </motion.div>
-                  ) : (
+                  {isInThemesSection || isNavExpanded ? (
                     <motion.div
                       key="navbar"
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -295,7 +348,9 @@ export default function Home() {
                         ease: [0.4, 0, 0.2, 1],
                         delay: 0.1,
                       }}
-                      className="flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black rounded-full"
+                      className={`flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black ${
+                        isInThemesSection ? "rounded-none" : "rounded-full"
+                      }`}
                     >
                       <Image
                         src="/logo-white.png"
@@ -342,6 +397,18 @@ export default function Home() {
                           Waitlist
                         </a>
                       </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="island"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="flex items-center space-x-2 bg-black rounded-full px-4 py-2"
+                    >
+                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
+                      <div className="w-16 h-1 bg-white/60 rounded-full"></div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -691,6 +758,7 @@ export default function Home() {
         {/* Themes Section - Solar system with orbiting planets */}
         <section
           id="themes"
+          ref={themesRef}
           className="py-32 px-8 relative overflow-hidden bg-black"
         >
           <motion.div
@@ -698,7 +766,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="max-w-7xl mx-auto text-center mb-20"
+            className="max-w-7xl mx-auto text-center mb-20 pointer-events-none"
           >
             <SectionMeta
               label="Themes"
@@ -721,7 +789,9 @@ export default function Home() {
           </motion.div>
 
           {/* Orbit system */}
-          <OrbitingThemes planets={themePlanets} />
+          <div className="relative pointer-events-auto">
+            <OrbitingThemes planets={themePlanets} />
+          </div>
         </section>
 
         {/* Transition: Themes → Pricing */}
@@ -1604,18 +1674,18 @@ function OrbitingThemes({ planets }: { planets: readonly Planet[] }) {
 
   return (
     <div
-      className="relative mx-auto w-full max-w-[1400px] h-[900px] flex items-center justify-center [perspective:1200px]"
+      className="relative mx-auto w-full max-w-[1400px] h-[900px] flex items-center justify-center [perspective:1200px] z-10"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(Boolean(active))}
     >
       {/* central star glow */}
-      <div className="absolute w-40 h-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.15)_55%,rgba(255,255,255,0)_70%)]"></div>
+      <div className="pointer-events-none absolute w-40 h-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.15)_55%,rgba(255,255,255,0)_70%)]"></div>
       {/* subtle solar corona */}
-      <div className="absolute w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.04)_55%,rgba(255,255,255,0)_70%)]"></div>
+      <div className="pointer-events-none absolute w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.04)_55%,rgba(255,255,255,0)_70%)]"></div>
 
       {/* orbit rings */}
       <div
-        className="absolute left-1/2 top-1/2 pointer-events-none z-10"
+        className="absolute left-1/2 top-1/2 pointer-events-none z-0"
         style={{ transform: "translate(-50%, -50%) rotateX(55deg)" }}
       >
         {rings.map((r, idx) => (
@@ -1692,14 +1762,14 @@ function PlanetOnOrbit({
       transition={{ repeat: Infinity, ease: "linear", duration }}
     >
       <div
-        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)]"
+        className="absolute left-1/2 top-1/2 [transform:translate3d(0,0,0)] z-20"
         style={{ transform: `translate(${radius}px, -50%)` }}
       >
         <button
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           onClick={onActivate}
-          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full cursor-pointer"
+          className="group relative transform transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-white/30 rounded-full cursor-pointer z-20"
           aria-label={`${planet.name} theme`}
           style={{ pointerEvents: "auto" }}
         >
@@ -1715,7 +1785,7 @@ function PlanetOnOrbit({
               style={{ width: Math.max(32, diameter * 0.7) }}
             />
           </div>
-          <div className="absolute left-1/2 -translate-x-1/2 mt-4 whitespace-nowrap text-center">
+          <div className="absolute left-1/2 -translate-x-1/2 mt-4 whitespace-nowrap text-center pointer-events-none">
             <div className="text-white text-base font-semibold font-sf-pro">
               {planet.name}
             </div>
