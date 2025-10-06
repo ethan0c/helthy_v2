@@ -89,11 +89,9 @@ export default function Home() {
   >("monthly");
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isInThemesSection, setIsInThemesSection] = useState(false);
-  // bezel expansion + auto AI section
+  // AI section auto-expand
   const [showFeatureAI, setShowFeatureAI] = useState(false);
-  const [shouldExpandPhone, setShouldExpandPhone] = useState(false);
   const heroRef = useRef<HTMLDivElement | null>(null);
-  const ctaContainerRef = useRef<HTMLDivElement | null>(null);
   const aiAutoRef = useRef<HTMLDivElement | null>(null);
   const themesRef = useRef<HTMLDivElement | null>(null);
   const aiInView = useInView(aiAutoRef, { amount: 0.3, once: true });
@@ -138,22 +136,6 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
-
-  // Bezel expansion after CTA buttons fully leave viewport
-  useEffect(() => {
-    const onScroll = () => {
-      const el = ctaContainerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Add buffer zone for smoother transition
-      const fullyAbove = rect.bottom <= -50;
-
-      setShouldExpandPhone(fullyAbove);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Keep manual collapse state persistent - don't reset it automatically
   // This ensures once user closes AI, it stays closed until they manually open it again
@@ -246,27 +228,10 @@ export default function Home() {
 
   return (
     <>
-      {/* Black background with iPhone-shaped silver bevel */}
-      <div className="min-h-screen bg-black flex items-start justify-center px-2 pb-2 sm:px-4 sm:pb-4 lg:px-6 lg:pb-6">
-        {/* iPhone Screen with silver border following the curved shape */}
-        <motion.div
-          className="w-full bg-gradient-to-br from-gray-900 via-gray-800 to-black curved-edges overflow-hidden relative shadow-2xl border-8 border-slate-300 ring-2 ring-slate-400"
-          style={{
-            willChange: "transform, max-width",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-          }}
-          initial={{ maxWidth: "72rem" }}
-          animate={{
-            maxWidth: shouldExpandPhone ? "calc(100% - 2rem)" : "72rem",
-            width: "100%",
-          }}
-          transition={{
-            duration: 1.8,
-            ease: [0.19, 1, 0.22, 1],
-            type: "tween",
-          }}
-        >
+      {/* Clean black background - ctrl.xyz inspired */}
+      <div className="min-h-screen bg-black">
+        {/* Main content wrapper */}
+        <div className="w-full bg-black relative">
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
@@ -385,39 +350,20 @@ export default function Home() {
             {/* Removed old separate navbar */}
             {/* Removed old separate navbar */}
 
-            {/* Hero Section - Full iPhone Screen */}
+            {/* Hero Section - Clean ctrl.xyz style */}
             <section
               id="home"
               ref={heroRef}
               className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
             >
-              {/* Video Background */}
+              {/* Clean gradient background - ctrl.xyz inspired */}
               <div className="absolute inset-0">
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover video-fade-in"
-                  style={{
-                    filter: "brightness(0.8) contrast(1.1)",
-                    WebkitFilter: "brightness(0.8) contrast(1.1)",
-                  }}
-                >
-                  <source
-                    src="/325e6dc6-23c3-4836-b68e-aefe6b4997a6.mp4"
-                    type="video/mp4"
-                  />
-                </video>
-
-                {/* Seamless gradient overlay for better text readability */}
-                <div className="absolute inset-0 video-gradient-overlay"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40"></div>
-
-                {/* Atmospheric enhancement gradients */}
-                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-white/8 to-gray-300/3 rounded-full blur-3xl opacity-40"></div>
-                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-gray-300/6 to-white/3 rounded-full blur-3xl opacity-30"></div>
-                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-gray-200/4 to-gray-400/6 rounded-full blur-2xl opacity-25"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black"></div>
+                
+                {/* Subtle atmospheric gradients */}
+                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-cyan-500/8 to-blue-500/5 rounded-full blur-3xl opacity-25"></div>
+                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-violet-500/6 to-fuchsia-500/4 rounded-full blur-2xl opacity-20"></div>
               </div>
 
               <div className="relative z-10 px-8 w-full max-w-7xl mx-auto text-center mt-16">
@@ -489,7 +435,6 @@ export default function Home() {
 
                   {/* Main CTA */}
                   <motion.div
-                    ref={ctaContainerRef}
                     className="space-y-8 mt-16"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -512,7 +457,6 @@ export default function Home() {
                       </motion.button>
                     </div>
                   </motion.div>
-                  {/* Expansion now controlled by scroll position of CTA container */}
                 </motion.div>
               </div>
 
@@ -528,48 +472,31 @@ export default function Home() {
 
             {/* Invisible anchor for AI nav link */}
             <div id="ai" aria-hidden className="h-0" />
-            {/* Features Section - Redesigned with embedded AI overlay */}
+            {/* Features Section - ctrl.xyz inspired bento grid */}
             <section
               id="features"
-              className="relative overflow-hidden bg-[#0B0B0B] py-32 px-8"
-              style={{
-                isolation: "isolate",
-                willChange: "auto",
-              }}
+              className="relative overflow-hidden bg-black py-32 px-6 lg:px-8"
             >
-              {/* Subtle top/bottom vignettes like reference */}
-              <div className="pointer-events-none absolute inset-0">
-                <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-black via-black/60 to-transparent" />
-                <div className="absolute bottom-0 inset-x-0 h-56 bg-gradient-to-t from-black via-black/70 to-transparent" />
-              </div>
-
-              <div className="relative z-10 max-w-[1500px] mx-auto">
-                <div style={{ transform: "translateZ(0)" }}>
-                  <SectionMeta
-                    label="Features"
-                    number="02"
-                    tone="dark"
-                    className="mx-auto max-w-none"
-                  />
-                  <div className="text-center max-w-4xl mx-auto mb-24">
-                    <h2 className="text-[3.25rem] sm:text-[4.5rem] lg:text-[5.2rem] leading-[1.05] font-medium text-white font-sf-pro tracking-tight">
-                      <span className="italic font-light">Track</span>{" "}
-                      <span className="font-semibold">everything</span>
-                    </h2>
-                    <p className="mt-8 text-lg sm:text-xl text-white/80 font-sf-pro max-w-2xl mx-auto leading-relaxed">
-                      See every rep, meal, and recovery signal—unified and
-                      clear.
-                    </p>
-                    <div className="mt-10">
-                      <button className="px-7 py-4 rounded-2xl bg-[#1A1A1A] text-white/90 hover:text-white border border-white/10 font-mono text-xs tracking-wider uppercase shadow-inner shadow-white/5 hover:bg-[#222] transition-colors">
-                        More About Tracking
-                      </button>
-                    </div>
-                  </div>
+              <div className="relative z-10 max-w-7xl mx-auto">
+                <SectionMeta
+                  label="Features"
+                  number="02"
+                  tone="dark"
+                  className="mx-auto max-w-none"
+                />
+                <div className="text-center max-w-4xl mx-auto mb-20">
+                  <h2 className="text-4xl sm:text-5xl lg:text-6xl leading-tight font-semibold text-white font-sf-pro tracking-tight">
+                    Track everything.
+                    <br />
+                    <span className="text-white/60 font-light">Know everything.</span>
+                  </h2>
+                  <p className="mt-6 text-base sm:text-lg text-white/70 font-sf-pro max-w-2xl mx-auto leading-relaxed">
+                    Unified insights across training, nutrition, and recovery—designed for clarity, built for progress.
+                  </p>
                 </div>
 
-                {/* Three large feature cards - no containers, blended edges */}
-                <div className="grid md:grid-cols-3 gap-4 xl:gap-6 relative">
+                {/* Bento grid layout - ctrl.xyz style */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-16">
                   {[
                     {
                       title: "Monitor your training",
@@ -589,135 +516,93 @@ export default function Home() {
                   ].map((card, i) => (
                     <motion.div
                       key={card.title}
-                      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      viewport={{
-                        once: true,
-                        amount: 0.2,
-                        margin: "0px 0px -150px 0px",
-                      }}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
                       transition={{
-                        duration: 0.8,
+                        duration: 0.6,
                         ease: [0.25, 0.46, 0.45, 0.94],
-                        delay: i * 0.2,
+                        delay: i * 0.1,
                       }}
-                      className="group relative h-[740px] lg:h-[780px] overflow-hidden bg-transparent"
+                      className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-[1.02]"
                     >
-                      <div className="absolute inset-0">
+                      {/* Mockup image */}
+                      <div className="relative aspect-[3/4] overflow-hidden">
                         <Image
                           src={card.img}
                           alt={card.title}
                           fill
                           priority={i === 0}
-                          className="object-cover object-center transition-transform duration-[3000ms] ease-out group-hover:scale-[1.02]"
+                          className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
                         />
-                        {/* Seamless bottom blend into page background */}
-                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/85 via-25% to-transparent" />
-                        {/* Extended feather edge for perfect blending */}
-                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0B0B0B] to-transparent" />
+                        {/* Gradient overlay for text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                       </div>
-                      {/* Content bottom */}
-                      <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10 pt-40 flex flex-col">
-                        <h3 className="text-2xl lg:text-3xl font-semibold text-white font-inter mb-4 tracking-tight leading-tight">
+                      
+                      {/* Content */}
+                      <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8">
+                        <h3 className="text-xl lg:text-2xl font-semibold text-white font-sf-pro mb-2 tracking-tight">
                           {card.title}
                         </h3>
-                        <p className="text-white/70 text-sm lg:text-base font-sf-pro leading-relaxed max-w-[90%]">
+                        <p className="text-white/70 text-sm lg:text-base font-sf-pro leading-relaxed">
                           {card.copy}
                         </p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
-                {/* AI auto-expanding section - positioned right after cards */}
+                
+                {/* AI Coach Section - Clean card design inspired by ctrl.xyz */}
                 <motion.div
-                  key="ai-section"
-                  layoutId="ai-insights"
-                  initial={{ opacity: 1 }}
-                  animate={{
-                    width: showFeatureAI ? "100%" : 384,
-                    height: showFeatureAI ? "auto" : 84,
-                    borderRadius: showFeatureAI ? 46 : 42,
-                    y: showFeatureAI ? 40 : 0,
-                  }}
-                  transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="mt-20 mx-auto bg-gradient-to-br from-black/90 via-gray-900/90 to-black/90 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden relative"
-                  style={{
-                    paddingLeft: showFeatureAI ? 24 : 0,
-                    paddingRight: showFeatureAI ? 24 : 0,
-                    paddingTop: showFeatureAI ? 32 : 0,
-                    paddingBottom: showFeatureAI ? 32 : 0,
-                  }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="mt-12"
                 >
-                  {/* Collapsed state - Dynamic Island style */}
-                  {!showFeatureAI && (
-                    <motion.div
-                      initial={{ opacity: 1 }}
-                      animate={{ opacity: showFeatureAI ? 0 : 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex items-center justify-center h-full w-full"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-3 h-3 bg-white/60 rounded-full shadow-sm shadow-white/20"></div>
-                        <div className="w-20 h-1.5 bg-white/40 rounded-full"></div>
-                        <div className="text-xs text-white/80 font-sf-pro tracking-wide">
-                          AI Coach
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Expanded state - Full AI section */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: showFeatureAI ? 1 : 0 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: showFeatureAI ? 0.4 : 0,
-                    }}
-                    className={showFeatureAI ? "block" : "hidden"}
-                  >
-                    {/* Orbital glow effects */}
-                    <div className="absolute top-4 right-8 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-indigo-500/10 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-8 left-12 w-24 h-24 bg-gradient-to-br from-cyan-500/15 to-blue-500/10 rounded-full blur-2xl"></div>
-
-                    <div className="relative z-10">
-                      <div className="flex items-start justify-between mb-6">
-                        <div>
-                          <div className="text-xs text-white/50 font-sf-pro uppercase tracking-wider mb-1">
-                            AI Coach
+                  <div className="rounded-3xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-white/10 p-8 lg:p-10 backdrop-blur-sm">
+                    {/* AI Section Header */}
+                    <div className="flex items-start justify-between mb-8">
+                      <div>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                            <Brain className="w-5 h-5 text-white" />
                           </div>
-                          <div className="text-lg text-white/90 font-sf-pro font-medium">
-                            Unified guidance across training & nutrition
-                          </div>
-                          <div className="text-sm text-white/60 font-sf-pro mt-1">
-                            Your intelligent fitness companion in action
+                          <div>
+                            <div className="text-sm text-white/50 font-sf-pro uppercase tracking-wider">AI Coach</div>
+                            <div className="text-xl text-white font-sf-pro font-semibold">Your intelligent fitness companion</div>
                           </div>
                         </div>
-                      </div>
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="flex flex-col gap-6">
-                          <VoiceLoggingCard className="h-60" />
-                          <AIDescribeCard className="h-60" />
-                        </div>
-                        <div className="lg:col-span-2">
-                          <AIChatPanel className="min-h-[520px]" />
-                        </div>
+                        <p className="text-white/60 text-sm font-sf-pro max-w-2xl">
+                          Unified guidance across training, nutrition, and recovery—powered by AI that learns your patterns.
+                        </p>
                       </div>
                     </div>
-                  </motion.div>
+
+                    {/* AI Features Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <div className="flex flex-col gap-4">
+                        <VoiceLoggingCard className="h-60" />
+                        <AIDescribeCard className="h-60" />
+                      </div>
+                      <div className="lg:col-span-2">
+                        <AIChatPanel className="min-h-[520px]" />
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
-                {/* Invisible trigger for AI expansion */}
+                
+                {/* Invisible trigger for scroll effects */}
                 <div ref={aiAutoRef} className="mt-16" />
               </div>
             </section>
           </LayoutGroup>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Cinematic transition from iPhone to cosmic sections */}
-      <div className="relative h-32 bg-gradient-to-b from-black via-gray-900/50 to-black overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0)_70%)]"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
+      {/* Smooth transition between sections */}
+      <div className="relative h-20 bg-gradient-to-b from-black via-gray-950/50 to-black overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,rgba(0,0,0,0)_70%)]"></div>
       </div>
 
       {/* Outside iPhone Screen - Black Background Sections */}
@@ -1483,30 +1368,32 @@ function AIInsightsCard({
 function VoiceLoggingCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-gray-600 bg-gray-800/65 backdrop-blur-lg p-5 shadow-lg ${className}`}
+      className={`rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm p-6 shadow-lg hover:border-white/20 transition-all ${className}`}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-xl bg-gray-700 text-white flex items-center justify-center">
-          <Mic className="w-4 h-4" />
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center">
+          <Mic className="w-5 h-5" />
         </div>
-        <h4 className="text-sm font-semibold text-white font-sf-pro">
-          Voice logging
-        </h4>
+        <div>
+          <h4 className="text-base font-semibold text-white font-sf-pro">
+            Voice logging
+          </h4>
+          <p className="text-xs text-white/60 font-sf-pro">
+            Hands-free tracking
+          </p>
+        </div>
       </div>
-      <p className="text-xs text-gray-300 font-sf-pro mb-4">
-        Log workouts and meals hands‑free.
-      </p>
 
-      <div className="mt-2 flex flex-col items-center justify-center gap-4">
+      <div className="mt-6 flex flex-col items-center justify-center gap-5">
         <button
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
           aria-label="Start voice logging"
         >
           <Mic className="w-6 h-6" />
         </button>
-        <div className="w-full h-10 rounded-xl bg-white/70 border border-gray-200 flex items-center px-3 gap-2">
-          <div className="flex-1 h-4 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-full" />
-          <span className="text-[10px] text-gray-500 font-sf-pro">
+        <div className="w-full h-12 rounded-xl bg-white/[0.08] border border-white/10 flex items-center px-4 gap-3">
+          <div className="flex-1 h-2 bg-gradient-to-r from-indigo-400/40 via-purple-400/40 to-indigo-400/20 rounded-full" />
+          <span className="text-xs text-white/50 font-sf-pro">
             Listening…
           </span>
         </div>
