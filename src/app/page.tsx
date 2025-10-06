@@ -228,10 +228,10 @@ export default function Home() {
 
   return (
     <>
-      {/* Clean black background - ctrl.xyz inspired */}
-      <div className="min-h-screen bg-black">
+      {/* Clean white background - ctrl.xyz inspired */}
+      <div className="min-h-screen bg-white">
         {/* Main content wrapper */}
-        <div className="w-full bg-black relative">
+        <div className="w-full bg-white relative">
           <LayoutGroup id="ai-group">
             {/* Dynamic Island - Transforms into navbar */}
             <motion.div
@@ -265,8 +265,8 @@ export default function Home() {
                 className={`w-full h-full ${
                   isInThemesSection
                     ? ""
-                    : "dynamic-island rounded-full overflow-hidden"
-                } flex items-center justify-center`}
+                    : "rounded-full overflow-hidden"
+                } flex items-center justify-center bg-white/80 backdrop-blur-xl border border-gray-200`}
               >
                 <AnimatePresence mode="wait">
                   {isInThemesSection || isNavExpanded ? (
@@ -280,7 +280,7 @@ export default function Home() {
                         ease: [0.4, 0, 0.2, 1],
                         delay: 0.1,
                       }}
-                      className={`flex items-center justify-between w-full px-[15px] text-sm font-medium text-white bg-black ${
+                      className={`flex items-center justify-between w-full px-[15px] text-sm font-medium text-brand-black ${
                         isInThemesSection ? "rounded-none" : "rounded-full"
                       }`}
                     >
@@ -291,40 +291,40 @@ export default function Home() {
                         height={40}
                         className="h-8 w-auto"
                       />
-                      <div className="flex items-center space-x-6 font-sf-pro">
+                      <div className="flex items-center space-x-6 font-biennale">
                         <a
                           href="#home"
-                          className="hover:text-gray-300 transition-colors"
+                          className="hover:text-brand-lime transition-colors"
                         >
                           Home
                         </a>
                         <a
                           href="#features"
-                          className="hover:text-gray-300 transition-colors"
+                          className="hover:text-brand-lime transition-colors"
                         >
                           Features
                         </a>
                         <a
                           href="#ai"
-                          className="hover:text-gray-300 transition-colors"
+                          className="hover:text-brand-lime transition-colors"
                         >
                           AI
                         </a>
                         <a
                           href="#themes"
-                          className="hover:text-gray-300 transition-colors"
+                          className="hover:text-brand-lime transition-colors"
                         >
                           Themes
                         </a>
                         <a
                           href="#faq"
-                          className="hover:text-gray-300 transition-colors"
+                          className="hover:text-brand-lime transition-colors"
                         >
                           FAQ
                         </a>
                         <a
                           href="#waitlist"
-                          className="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition-colors shadow-lg font-medium text-xs"
+                          className="bg-brand-lime text-brand-black px-4 py-2 rounded-full hover:bg-brand-gold transition-colors shadow-lg font-medium text-xs"
                         >
                           Waitlist
                         </a>
@@ -337,125 +337,68 @@ export default function Home() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.25, ease: "easeOut" }}
-                      className="flex items-center space-x-2 bg-black rounded-full px-4 py-2"
+                      className="flex items-center space-x-2 px-4 py-2"
                     >
-                      <div className="w-2 h-2 bg-white/80 rounded-full"></div>
-                      <div className="w-16 h-1 bg-white/60 rounded-full"></div>
+                      <div className="w-2 h-2 bg-brand-lime rounded-full"></div>
+                      <div className="w-16 h-1 bg-brand-slate/40 rounded-full"></div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             </motion.div>
 
-            {/* Removed old separate navbar */}
-            {/* Removed old separate navbar */}
-
             {/* Hero Section - Clean ctrl.xyz style */}
             <section
               id="home"
               ref={heroRef}
-              className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden pt-24 pb-16"
             >
-              {/* Clean gradient background - ctrl.xyz inspired */}
-              <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black"></div>
-                
-                {/* Subtle atmospheric gradients */}
-                <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 rounded-full blur-3xl opacity-30"></div>
-                <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-cyan-500/8 to-blue-500/5 rounded-full blur-3xl opacity-25"></div>
-                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-br from-violet-500/6 to-fuchsia-500/4 rounded-full blur-2xl opacity-20"></div>
-              </div>
+              {/* Clean gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-white"></div>
+              
+              {/* Subtle accent orbs */}
+              <div className="absolute top-20 right-20 w-96 h-96 bg-brand-lime/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-20 left-20 w-80 h-80 bg-brand-orange/8 rounded-full blur-3xl"></div>
 
-              <div className="relative z-10 px-8 w-full max-w-7xl mx-auto text-center mt-16">
+              <div className="relative z-10 px-6 lg:px-8 w-full max-w-7xl mx-auto text-center">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1.2, ease: "easeOut" }}
                 >
-                  <SectionMeta
-                    label="Home"
-                    number="01"
-                    tone="dark"
-                    className="text-left"
-                  />
-                  {/* Status Bar Space */}
-                  <div className="h-8"></div>
-
-                  {/* Main Greeting */}
-                  <div className="mb-14 mt-10">
-                    <div className="text-[11px] tracking-[0.35em] text-white/50 mb-8 font-sf-pro uppercase flex items-center justify-center gap-5">
-                      <span className="h-px w-12 bg-white/15" /> HELTHY PRESENTS{" "}
-                      <span className="h-px w-12 bg-white/15" />
-                    </div>
-                    <h1 className="text-[2.9rem] md:text-[4.6rem] lg:text-[5.4rem] font-extrabold text-white mb-8 font-inter leading-[0.9] tracking-[-0.02em]">
-                      THE FUTURE OF FITNESS
+                  {/* Main Heading - ctrl.xyz style */}
+                  <div className="mb-12">
+                    <h1 className="text-[4rem] md:text-[6rem] lg:text-[8rem] font-black text-brand-black mb-6 font-biennale leading-[0.9] tracking-tight">
+                      THE FUTURE
+                      <br />
+                      <span className="text-brand-black">OF FITNESS</span>
                     </h1>
-                    <h2 className="text-xl md:text-[2.3rem] lg:text-[2.8rem] font-medium text-white/90 mb-14 font-inter leading-snug max-w-5xl mx-auto">
-                      <span className="bg-gradient-to-r from-white via-gray-200 to-white/70 bg-clip-text text-transparent">
-                        Data in motion
-                      </span>
-                      .{" "}
-                      <span className="text-white/75">
-                        Precision in progress.
-                      </span>
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-brand-slate mb-8 font-biennale max-w-3xl mx-auto">
+                      Data in motion. Precision in progress.
                     </h2>
-                    <div className="max-w-5xl mx-auto flex flex-col items-center gap-10">
-                      <div className="flex flex-col md:flex-row md:items-center gap-7 w-full justify-center">
-                        <p className="text-[12px] md:text-xs lg:text-sm font-sf-pro tracking-[0.25em] text-white/55 uppercase flex items-center gap-2">
-                          <span className="inline-block h-1 w-1 rounded-full bg-white/40" />{" "}
-                          ZERO NOISE • PURE SIGNAL
-                        </p>
-                        <p className="text-[12px] md:text-xs lg:text-sm font-sf-pro tracking-[0.25em] text-white/55 uppercase flex items-center gap-2">
-                          <span className="inline-block h-1 w-1 rounded-full bg-white/40" />{" "}
-                          REPS • MEALS • RECOVERY
-                        </p>
-                      </div>
-                      <p className="text-xl md:text-2xl lg:text-[2.2rem] font-inter font-semibold tracking-tight text-white/90 text-center leading-snug">
-                        Your body —{" "}
-                        <span className="text-white/65 font-normal">
-                          measured
-                        </span>
-                        ,{" "}
-                        <span className="text-white/65 font-normal">
-                          interpreted
-                        </span>
-                        ,{" "}
-                        <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                          mastered
-                        </span>
-                        .
-                      </p>
-                      <p className="text-[11px] md:text-xs tracking-[0.35em] text-white/40 font-sf-pro uppercase">
-                        NO HYPE. JUST PROOF.
-                      </p>
-                    </div>
                   </div>
 
-                  {/* Quick Stats Dashboard removed per request */}
-
-                  {/* Main CTA */}
+                  {/* CTA Buttons */}
                   <motion.div
-                    className="space-y-8 mt-16"
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
+                    transition={{ delay: 0.4 }}
                   >
-                    <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                      <motion.button
-                        className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-5 rounded-full text-lg font-normal shadow-2xl hover:shadow-3xl transition-all duration-300 font-sf-pro"
-                        whileHover={{ scale: 1.05, y: -3 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        Start Your Journey
-                      </motion.button>
-                      <motion.button
-                        className="border-2 border-gray-400 text-gray-300 px-12 py-5 rounded-full text-lg font-normal hover:border-gray-300 hover:bg-gray-800/50 transition-all duration-300 font-sf-pro"
-                        whileHover={{ scale: 1.05, y: -3 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        Join Waitlist
-                      </motion.button>
-                    </div>
+                    <motion.button
+                      className="bg-brand-lime text-brand-black px-8 py-4 rounded-full text-base font-semibold shadow-lg hover:bg-brand-gold transition-all duration-300 font-biennale"
+                      whileHover={{ scale: 1.05, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Download for Chrome
+                    </motion.button>
+                    <motion.button
+                      className="border-2 border-brand-black text-brand-black px-8 py-4 rounded-full text-base font-semibold hover:bg-brand-black hover:text-white transition-all duration-300 font-biennale"
+                      whileHover={{ scale: 1.05, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Join Waitlist
+                    </motion.button>
                   </motion.div>
                 </motion.div>
               </div>
@@ -466,7 +409,7 @@ export default function Home() {
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <ChevronDown className="w-6 h-6 text-gray-400" />
+                <ChevronDown className="w-6 h-6 text-brand-slate" />
               </motion.div>
             </section>
 
