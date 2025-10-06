@@ -11,10 +11,17 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        brand: {
+          black: "#151515",
+          lime: "#CDFB50",
+          slate: "#607C8A",
+          orange: "#E96C2C",
+          gold: "#D8B440",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "Arial", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "monospace"],
+        biennale: ["var(--font-biennale)", "sans-serif"],
+        sans: ["var(--font-biennale)", "Arial", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
